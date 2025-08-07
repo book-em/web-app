@@ -4,7 +4,9 @@ import { AuthAPI, type RegisterRequestDTO, type LoginRequestDTO, type LoginRespo
 import type { AxiosError, AxiosResponse } from 'axios';
 import { setJWT } from '../../api/localstorage';
 import { UserRole, type UserDTO } from '../../api/user.api';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const formConfirmPassword = ref('');
 const formDTO = ref<RegisterRequestDTO>({
     username: "",
@@ -58,6 +60,7 @@ const loginAsNewlyCreatedUser = (username: string, password: string) => {
     AuthAPI.login(loginDto).then((resLogin: AxiosResponse<LoginResponseDTO>) => {
         const jwt = resLogin.data.jwt;
         setJWT(jwt);
+        router.push('/');
     }).catch((_: AxiosError) => {
 
     });
