@@ -27,6 +27,13 @@ export interface UserUpdateDTO {
     address: string | null
 }
 
+export interface UserChangePasswordDTO {
+    id: number,
+    oldPassword: string,
+    newPassword: string,
+    newPasswordConfirm: string
+}
+
 export class UserAPI {
     static findById(id: number): Promise<AxiosResponse<UserDTO>> {
         return axiosInstance.get(`/${id}`);
@@ -34,5 +41,8 @@ export class UserAPI {
 
     static update(dto: UserUpdateDTO): Promise<AxiosResponse<null>> {
         return axiosInstance.put(`/update`, dto);
+    }
+    static changePassword(dto: UserChangePasswordDTO): Promise<AxiosResponse<null>> {
+        return axiosInstance.put(`/password`, dto);
     }
 }
