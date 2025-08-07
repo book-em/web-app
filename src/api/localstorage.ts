@@ -2,10 +2,10 @@ import { Buffer } from 'buffer';
 import { UserRole } from './user.api';
 
 export interface JWTStruct {
-    id: number,
-    role: string,
-    sub: string,
-    must_change_password: boolean
+    username: string
+    sub: number,
+    role: UserRole,
+
 };
 
 export function setJWT(jwt: string) {
@@ -42,7 +42,7 @@ export function getJWTUsername(): string {
     if (jwtString == null) {
         return "";
     }
-    return getJWT(jwtString).sub;
+    return getJWT(jwtString).username;
 }
 
 export function getJWTId(): number {
@@ -50,5 +50,5 @@ export function getJWTId(): number {
     if (jwtString == null) {
         return -1;
     }
-    return getJWT(jwtString).id;
+    return getJWT(jwtString).sub;
 }

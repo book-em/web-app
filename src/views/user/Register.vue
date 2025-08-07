@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { AuthAPI, type RegisterRequestDTO, type LoginRequestDTO, type LoginResponseDTO } from '../../api/auth.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { setJWT } from '../../api/localstorage';
 import { UserRole, type UserDTO } from '../../api/user.api';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../stores/auth-store';
 
+const auth = useAuthStore();
 const router = useRouter();
 const formConfirmPassword = ref('');
 const formDTO = ref<RegisterRequestDTO>({
@@ -18,6 +20,10 @@ const formDTO = ref<RegisterRequestDTO>({
     role: UserRole.Guest,
 });
 const error = ref('');
+
+onMounted(() => {
+    auth.checkLocalStorage();
+});
 
 const validateForm = (): string => {
     const isEmpty = (s: string) => {
@@ -59,7 +65,7 @@ const loginAsNewlyCreatedUser = (username: string, password: string) => {
     const loginDto: LoginRequestDTO = { usernameOrEmail: username, password: password };
     AuthAPI.login(loginDto).then((resLogin: AxiosResponse<LoginResponseDTO>) => {
         const jwt = resLogin.data.jwt;
-        setJWT(jwt);
+        auth.login(jwt);
         router.push('/');
     }).catch((_: AxiosError) => {
 
