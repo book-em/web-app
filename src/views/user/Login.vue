@@ -30,11 +30,6 @@ const doLogin = () => {
         const jwt = res.data.jwt;
         auth.login(jwt);
         router.push('/');
-
-        console.log(getJWTId());
-        console.log(getJWTUsername());
-        console.log(getJWTRole());
-
     }).catch((err: AxiosError) => {
         if (err.response?.status == 400) {
             error.value = "Unknown user or password";
