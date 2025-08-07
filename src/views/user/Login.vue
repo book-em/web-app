@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { AuthAPI, type LoginRequestDTO, type LoginResponseDTO } from '../../api/auth.api';
 import type { AxiosError, AxiosResponse } from 'axios';
-import { setJWT } from '../../api/localstorage';
+import { getJWTId, getJWTRole, getJWTUsername, setJWT } from '../../api/localstorage';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '../../stores/auth-store';
 
+const auth = useAuthStore();
 const router = useRouter();
 const formUsernameOrEmail = ref('');
 const formPassword = ref('');
 const error = ref('');
+
+onMounted(() => {
+    auth.checkLocalStorage();
+});
 
 const doLogin = () => {
     const usernameOrEmail = formUsernameOrEmail.value;
@@ -22,8 +28,13 @@ const doLogin = () => {
 
     AuthAPI.login(dto).then((res: AxiosResponse<LoginResponseDTO>) => {
         const jwt = res.data.jwt;
-        setJWT(jwt);
+        auth.login(jwt);
         router.push('/');
+
+        console.log(getJWTId());
+        console.log(getJWTUsername());
+        console.log(getJWTRole());
+
     }).catch((err: AxiosError) => {
         if (err.response?.status == 400) {
             error.value = "Unknown user or password";
