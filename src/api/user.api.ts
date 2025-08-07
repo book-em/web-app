@@ -1,3 +1,6 @@
+import type { AxiosResponse } from "axios"
+import axiosInstance from "./util"
+
 export enum UserRole {
     Guest = "guest",
     Host = "host",
@@ -14,6 +17,22 @@ export interface UserDTO {
     role: UserRole
 }
 
-export class UserAPI {
+export interface UserUpdateDTO {
+    id: number,
 
+    username: string | null
+    email: string | null
+    name: string | null
+    surname: string | null
+    address: string | null
+}
+
+export class UserAPI {
+    static findById(id: number): Promise<AxiosResponse<UserDTO>> {
+        return axiosInstance.get(`/${id}`);
+    }
+
+    static update(dto: UserUpdateDTO): Promise<AxiosResponse<null>> {
+        return axiosInstance.put(`/update`, dto);
+    }
 }
