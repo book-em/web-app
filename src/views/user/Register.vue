@@ -53,7 +53,10 @@ const doRegister = () => {
         loginAsNewlyCreatedUser(dto.username, dto.password);
     }).catch((err: AxiosError) => {
         if (err.response?.status == 400) {
+            console.error(err);
             error.value = "Could not create an account";
+        } else if (err.response?.status == 409) {
+            error.value = "Username or email taken";
         } else {
             console.error(err);
             error.value = "Unknown error. Check the console";
