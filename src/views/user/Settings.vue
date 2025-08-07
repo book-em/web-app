@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { UserAPI, type UserDTO, type UserUpdateDTO } from '../../api/user.api';
+import { UserAPI, type UserChangePasswordDTO, type UserDTO, type UserUpdateDTO } from '../../api/user.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useAuthStore } from '../../stores/auth-store';
 import { useRouter } from 'vue-router';
@@ -15,6 +15,12 @@ const formDTO = ref<UserUpdateDTO>({
     name: "",
     surname: "",
     address: "",
+});
+const formPasswordDTO = ref<UserChangePasswordDTO>({
+    id: 0,
+    oldPassword: "",
+    newPassword: "",
+    newPasswordConfirm: "",
 });
 const error = ref('');
 const warning = ref('');
@@ -31,6 +37,7 @@ onMounted(() => {
     UserAPI.findById(myId).then((res: AxiosResponse<UserDTO>) => {
         user.value = res.data;
         formDTO.value = { ...user.value };
+        formPasswordDTO.value.id = user.value.id;
     }).catch((err) => { });
 });
 
@@ -50,6 +57,34 @@ const doUpdateUserInfo = () => {
             error.value = "Could not change user details";
         } else if (err.response?.status == 409) {
             error.value = "Username or email taken";
+        } else {
+            console.error(err);
+            error.value = "Unknown error. Check the console";
+        }
+    });
+}
+
+const doChangePassword = () => {
+    const dto = formPasswordDTO.value;
+
+    if (dto.newPassword != dto.newPasswordConfirm) {
+        error.value = "Passwords do not match";
+        return;
+    }
+    if (dto.oldPassword == dto.newPassword) {
+        error.value = "New password must be different";
+        return;
+    }
+
+    error.value = "";
+
+    UserAPI.changePassword(dto).then((_: AxiosResponse<null>) => {
+    }).catch((err: AxiosError) => {
+        if (err.response?.status == 400) {
+            console.error(err);
+            error.value = "Could not change password";
+        } else if (err.response?.status == 401) {
+            error.value = "Wrong password";
         } else {
             console.error(err);
             error.value = "Unknown error. Check the console";
@@ -87,6 +122,22 @@ const duringUsernameChange = () => {
         </p>
 
         <button type="submit">Update</button>
+    </form>
+
+    <hr />
+
+    Change your password
+
+    <form @submit.prevent="doChangePassword">
+        <label> <input v-model.trim="formPasswordDTO!.oldPassword" type="password" /> Old password</label><br />
+        <label> <input v-model.trim="formPasswordDTO!.newPassword" type="password" /> New password</label><br />
+        <label> <input v-model.trim="formPasswordDTO!.newPasswordConfirm" type="password" /> Confirm new password</label><br />
+
+        <p v-if="warning.length > 0" class="warning">
+            {{ warning }}
+        </p>
+
+        <button type="submit">Change password</button>
     </form>
 
 </template>
