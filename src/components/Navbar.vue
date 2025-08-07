@@ -23,7 +23,7 @@ const logOut = () => {
             <RouterLink to="/register">Register</RouterLink> <br />
         </div>
         <div v-else>
-            <RouterLink to="/update">{{ auth.username }}</RouterLink> <br />
+            <RouterLink to="/my-settings">{{ auth.username }}</RouterLink> <br />
             <RouterLink to="/" @click.prevent="logOut">Sign out</RouterLink> <br />
         </div>
     </nav>
