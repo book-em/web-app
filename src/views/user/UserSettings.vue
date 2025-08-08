@@ -133,10 +133,6 @@ const duringUsernameChange = () => {
         <label> <input v-model.trim="formPasswordDTO!.newPassword" type="password" /> New password</label><br />
         <label> <input v-model.trim="formPasswordDTO!.newPasswordConfirm" type="password" /> Confirm new password</label><br />
 
-        <p v-if="warning.length > 0" class="warning">
-            {{ warning }}
-        </p>
-
         <button type="submit">Change password</button>
     </form>
 
