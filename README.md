@@ -4,6 +4,8 @@
 
 **Dev server**
 
+- Minimum Node version: 22.12.0
+- Recommended Node version: [22.18.0 - 24.5.0]
 - Install all the neccessary packages: `npm i`
 - Run on the development server: `npm run dev`
 - Build: `npm run build`
