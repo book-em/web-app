@@ -29,9 +29,7 @@ const usernameIsDifferent = () => user.value?.username != formDTO.value.username
 
 onMounted(() => {
     auth.checkLocalStorage();
-});
 
-onMounted(() => {
     const myId = auth.id;
 
     UserAPI.findById(myId).then((res: AxiosResponse<UserDTO>) => {
@@ -131,7 +129,8 @@ const duringUsernameChange = () => {
     <form @submit.prevent="doChangePassword">
         <label> <input v-model.trim="formPasswordDTO!.oldPassword" type="password" /> Old password</label><br />
         <label> <input v-model.trim="formPasswordDTO!.newPassword" type="password" /> New password</label><br />
-        <label> <input v-model.trim="formPasswordDTO!.newPasswordConfirm" type="password" /> Confirm new password</label><br />
+        <label> <input v-model.trim="formPasswordDTO!.newPasswordConfirm" type="password" /> Confirm new
+            password</label><br />
 
         <button type="submit">Change password</button>
     </form>
