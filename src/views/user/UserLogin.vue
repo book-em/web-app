@@ -13,8 +13,6 @@ const formPassword = ref('');
 const error = ref('');
 const loading = ref(false);
 
-
-
 onMounted(() => {
     auth.checkLocalStorage();
 });
@@ -50,32 +48,34 @@ const doLogin = () => {
 
 <template>
     <div class="login-background">
-    <Card class="center">
-        <template #title><h2>Login</h2></template>
-        <template #content>
-            <Form @submit="doLogin" >    
-                <div class="form-div" >
-                    <InputText type="text" placeholder="Username or email" v-model.trim="formUsernameOrEmail" fluid />
-                    <InputText type="password" placeholder="Password"  v-model.trim="formPassword" fluid />
-                    
-                    <Button class="btn" type="submit" severity="success" :disabled="loading">
-                        Log in 
-                        <ProgressSpinner v-show="loading" class="btn-spinner" strokeWidth="8" />
-                    </Button>
-                    
-                    <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
-                </div>
-            </Form>
-        </template>
-        <template #footer>
-            <RouterLink class="text-center mt" to="/register">Or create an account</RouterLink>
-        </template>
-    </Card>
+        <Card class="center">
+            <template #title>
+                <h2>Login</h2>
+            </template>
+            <template #content>
+                <Form @submit="doLogin">
+                    <div class="form-div">
+                        <InputText type="text" placeholder="Username or email" v-model.trim="formUsernameOrEmail"
+                            fluid />
+                        <InputText type="password" placeholder="Password" v-model.trim="formPassword" fluid />
+
+                        <Button class="btn" type="submit" severity="success" :disabled="loading">
+                            Log in
+                        </Button>
+
+                        <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}
+                        </Message>
+                    </div>
+                </Form>
+            </template>
+            <template #footer>
+                <RouterLink class="text-center mt" to="/register">Or create an account</RouterLink>
+            </template>
+        </Card>
     </div>
 </template>
 
 <style lang="css" scoped>
-
 .login-background {
     position: fixed;
     top: 0;
@@ -92,11 +92,11 @@ const doLogin = () => {
     margin: auto;
     width: 40%;
     margin-top: 8em;
-    background-color: rgba(255, 255, 255, 0.85); /* Optional frosted glass */
+    background-color: rgba(255, 255, 255, 0.85);
     padding: 2em;
     border-radius: 10px;
-    box-shadow: 16px 32px 32px rgba(0,0,0,0.4);
-} 
+    box-shadow: 16px 32px 32px rgba(0, 0, 0, 0.4);
+}
 
 h2 {
     text-align: center;
@@ -104,7 +104,7 @@ h2 {
 }
 
 .text-center {
-    display:block;
+    display: block;
     text-align: center;
 }
 
@@ -112,13 +112,7 @@ h2 {
     margin-top: 1em;
 }
 
-.btn-spinner {
-    width: 1em;
-    height: 1em;
-    margin-left: 0.5em;
-}
-
-.form-div > * {
+.form-div>* {
     margin-top: 1em;
 }
 
