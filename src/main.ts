@@ -13,6 +13,7 @@ import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
 import Menubar from 'primevue/menubar';
+import FloatLabel from 'primevue/floatlabel';
 import 'primeicons/primeicons.css';
 import 'tailwindcss-primeui';
 
@@ -40,5 +41,6 @@ app.component('Card', Card);
 app.component('Fieldset', Fieldset);
 app.component('Select', Select);
 app.component('Menubar', Menubar);
+app.component('FloatLabel', FloatLabel);
 
 app.mount('#app');
