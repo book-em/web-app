@@ -42,6 +42,7 @@ const computeNavbar = () => {
             label: auth.username,
             icon: 'pi pi-user',
             items: [
+                { label: `${auth.username} (${auth.role})`, disabled: true, class: "label" },
                 { label: 'Settings', icon: 'pi pi-cog', command: () => goto('/my-settings') },
                 { label: 'Log out', icon: 'pi pi-sign-out', command: () => logOut() },
             ]
@@ -109,5 +110,17 @@ const menubarClass = computed(() => {
 
 .menubar-admin {
     background-image: linear-gradient(to right, var(--p-surface-0), var(--p-teal-100));
+}
+
+:deep(.label) {
+    background: none !important;
+    color: var(--p-text-color);
+    cursor: default !important;
+    pointer-events: none;
+    opacity: 1 !important;
+    font-style: italic;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid var(--p-text-color);
 }
 </style>
