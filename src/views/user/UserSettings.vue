@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { UserAPI, type UserChangePasswordDTO, type UserDTO, type UserUpdateDTO } from '../../api/user.api';
+import { UserAPI, UserRole, type UserChangePasswordDTO, type UserDTO, type UserUpdateDTO } from '../../api/user.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useAuthStore } from '../../stores/auth-store';
 import { useRouter } from 'vue-router';
@@ -24,6 +24,7 @@ const formPasswordDTO = ref<UserChangePasswordDTO>({
 });
 const error = ref('');
 const warning = ref('');
+const errorDelete = ref('');
 
 const usernameIsDifferent = () => user.value?.username != formDTO.value.username;
 
@@ -98,6 +99,18 @@ const duringUsernameChange = () => {
     }
 }
 
+const doDeleteUser = () => {
+    errorDelete.value = '';
+
+    UserAPI.deleteById(auth.id).then(() => {
+        auth.logout();
+        router.push("/");
+    }).catch((err: AxiosError) => {
+        errorDelete.value = err.response.data as string;
+        console.error(err);
+    });
+}
+
 </script>
 
 <template>
@@ -134,6 +147,30 @@ const duringUsernameChange = () => {
 
         <button type="submit">Change password</button>
     </form>
+
+    <hr />
+
+    <div class="error">Delete your account</div>
+
+    <template v-if="auth.role == UserRole.Guest">
+    You will not be able to delete your account if you have active reservations.
+    </template>
+    <template v-else-if="auth.role == UserRole.Host">
+    You will not be able to delete your account if any of your rooms have active reservations.
+    </template>
+
+    <template v-if="auth.role == UserRole.Admin">
+        Administrators cannot delete their accounts.
+    </template>
+    <template v-else>
+        <br/>
+        <p v-if="errorDelete.length > 0" class="error">
+            {{ errorDelete }}
+        </p>
+
+        <button @click="doDeleteUser">Delete user</button>
+    </template>
+
 
 </template>
 
