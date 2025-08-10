@@ -25,6 +25,9 @@ const formPasswordDTO = ref<UserChangePasswordDTO>({
 const error = ref('');
 const warning = ref('');
 const errorDelete = ref('');
+const formDetailsLoading = ref(false);
+const formPasswordLoading = ref(false);
+const formDeleteLoading = ref(false);
 
 const usernameIsDifferent = () => user.value?.username != formDTO.value.username;
 
@@ -44,6 +47,7 @@ const doUpdateUserInfo = () => {
     const dto = formDTO.value;
 
     error.value = "";
+    formDetailsLoading.value = true;
 
     UserAPI.update(dto).then((_: AxiosResponse<null>) => {
         if (usernameIsDifferent()) {
@@ -60,6 +64,8 @@ const doUpdateUserInfo = () => {
             console.error(err);
             error.value = "Unknown error. Check the console";
         }
+    }).finally(() => {
+        formDetailsLoading.value = false;
     });
 }
 
@@ -76,6 +82,7 @@ const doChangePassword = () => {
     }
 
     error.value = "";
+    formPasswordLoading.value = true;
 
     UserAPI.changePassword(dto).then((_: AxiosResponse<null>) => {
     }).catch((err: AxiosError) => {
@@ -88,6 +95,8 @@ const doChangePassword = () => {
             console.error(err);
             error.value = "Unknown error. Check the console";
         }
+    }).finally(() => {
+        formPasswordLoading.value = false;
     });
 }
 
@@ -102,84 +111,140 @@ const duringUsernameChange = () => {
 const doDeleteUser = () => {
     errorDelete.value = '';
 
+    formDeleteLoading.value = true;
+
     UserAPI.deleteById(auth.id).then(() => {
         auth.logout();
         router.push("/");
     }).catch((err: AxiosError) => {
         errorDelete.value = err.response.data as string;
         console.error(err);
+    }).finally(() => {
+        formDeleteLoading.value = false;
     });
 }
 
 </script>
 
 <template>
-    <p v-if="error.length > 0" class="error">
-        {{ error }}
-    </p>
+    <Form @submit.prevent="doUpdateUserInfo" class="center">
+        <div class="form-div">
+            <Fieldset legend="Your settings">
+                <InputText type="text" placeholder="Username" @input="duringUsernameChange"
+                    v-model.trim="formDTO!.username" fluid />
+                <InputText type="email" placeholder="user@email.com" v-model.trim="formDTO!.email" fluid />
+                <InputText type="text" placeholder="Name" v-model.trim="formDTO!.name" fluid />
+                <InputText type="text" placeholder="Surname" v-model.trim="formDTO!.surname" fluid />
+                <InputText type="text" placeholder="Address" v-model.trim="formDTO!.address" fluid />
 
-    Your settings
+                <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
+                <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
+                </Message>
 
-    <form @submit.prevent="doUpdateUserInfo">
-        <label> <input @input="duringUsernameChange" v-model.trim="formDTO!.username" type="text" />
-            Username</label><br />
-        <label> <input v-model.trim="formDTO!.email" type="email" /> Email</label><br />
-        <label> <input v-model.trim="formDTO!.name" type="text" /> Name</label><br />
-        <label> <input v-model.trim="formDTO!.surname" type="text" /> Surname</label><br />
-        <label> <input v-model.trim="formDTO!.address" type="text" /> Address</label><br />
+                <Button class="btn" type="submit" severity="success" :disabled="formDetailsLoading">
+                    Update settings
+                </Button>
+            </Fieldset>
+        </div>
+    </Form>
 
-        <p v-if="warning.length > 0" class="warning">
-            {{ warning }}
-        </p>
+    <Form @submit.prevent="doChangePassword" class="center">
+        <div class="form-div">
+            <Fieldset legend="Change password">
+                <InputText type="password" placeholder="Old password" v-model.trim="formPasswordDTO!.oldPassword"
+                    fluid />
+                <InputText type="password" placeholder="New password" v-model.trim="formPasswordDTO!.newPassword"
+                    fluid />
+                <InputText type="password" placeholder="Confirm password"
+                    v-model.trim="formPasswordDTO!.newPasswordConfirm" fluid />
 
-        <button type="submit">Update</button>
-    </form>
+                <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
 
-    <hr />
+                <Button class="btn" type="submit" severity="info" :disabled="formPasswordLoading">
+                    Change password
+                </Button>
+            </Fieldset>
+        </div>
+    </Form>
 
-    Change your password
+    <Form @submit.prevent="doDeleteUser" class="center">
+        <div class="form-div">
+            <Fieldset legend="Delete user" class="panic">
+                <template v-if="auth.role == UserRole.Guest">
+                    You will not be able to delete your account if you have active reservations.
+                </template>
+                <template v-else-if="auth.role == UserRole.Host">
+                    You will not be able to delete your account if any of your rooms have active reservations.
+                </template>
 
-    <form @submit.prevent="doChangePassword">
-        <label> <input v-model.trim="formPasswordDTO!.oldPassword" type="password" /> Old password</label><br />
-        <label> <input v-model.trim="formPasswordDTO!.newPassword" type="password" /> New password</label><br />
-        <label> <input v-model.trim="formPasswordDTO!.newPasswordConfirm" type="password" /> Confirm new
-            password</label><br />
+                <template v-if="auth.role == UserRole.Admin">
+                    Administrators cannot delete their accounts.
+                </template>
+                <template v-else>
+                    <br />
+                    <br />
 
-        <button type="submit">Change password</button>
-    </form>
+                    <Message v-show="errorDelete.length > 0" severity="error" size="small" variant="simple">
+                        {{ errorDelete }}
+                    </Message>
 
-    <hr />
-
-    <div class="error">Delete your account</div>
-
-    <template v-if="auth.role == UserRole.Guest">
-    You will not be able to delete your account if you have active reservations.
-    </template>
-    <template v-else-if="auth.role == UserRole.Host">
-    You will not be able to delete your account if any of your rooms have active reservations.
-    </template>
-
-    <template v-if="auth.role == UserRole.Admin">
-        Administrators cannot delete their accounts.
-    </template>
-    <template v-else>
-        <br/>
-        <p v-if="errorDelete.length > 0" class="error">
-            {{ errorDelete }}
-        </p>
-
-        <button @click="doDeleteUser">Delete user</button>
-    </template>
-
-
+                    <Button class="btn" type="submit" severity="danger" :disabled="formDeleteLoading">
+                        Delete my account
+                    </Button>
+                </template>
+            </Fieldset>
+        </div>
+    </Form>
 </template>
 
 <style lang="css" scoped>
-.error {
-    color: red;
+.center {
+    margin: auto;
+    width: 60%;
+    margin-top: 1em;
 }
 
-.warning {
-    color: orange;
+h2 {
+    text-align: center;
+    font-size: 2em;
+}
+
+.text-center {
+    display: block;
+    text-align: center;
+}
+
+.form-div {
+    margin-top: 1em;
+}
+
+.form-div * {
+    margin-top: 0.25em;
+}
+
+.form-div .btn {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1em;
+    width: 32%;
+}
+
+.inline-fields {
+    display: flex;
+    gap: 1em;
+}
+
+.inline-fields>* {
+    flex: 1;
+}
+
+
+:deep(.panic .p-fieldset-legend-label) {
+    color: var(--p-red-500);
+}
+
+.panic button {
+    float: right;
 }
 </style>
