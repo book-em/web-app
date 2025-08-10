@@ -170,12 +170,6 @@ h2 {
     margin-top: 1em;
 }
 
-.btn-spinner {
-    width: 1em;
-    height: 1em;
-    margin-left: 0.5em;
-}
-
 .form-div * {
     margin-top: 0.25em;
 }

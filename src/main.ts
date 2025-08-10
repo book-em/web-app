@@ -12,6 +12,9 @@ import { ProgressSpinner } from 'primevue';
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
+import Menubar from 'primevue/menubar';
+import 'primeicons/primeicons.css';
+import 'tailwindcss-primeui';
 
 const app = createApp(App);
 
@@ -36,6 +39,6 @@ app.component('ProgressSpinner', ProgressSpinner);
 app.component('Card', Card);
 app.component('Fieldset', Fieldset);
 app.component('Select', Select);
-
+app.component('Menubar', Menubar);
 
 app.mount('#app');
