@@ -10,6 +10,8 @@ import Button from 'primevue/button';
 import Message from 'primevue/message';
 import { ProgressSpinner } from 'primevue';
 import Card from 'primevue/card';
+import Fieldset from 'primevue/fieldset';
+import Select from 'primevue/select';
 
 const app = createApp(App);
 
@@ -32,6 +34,8 @@ app.component('Button', Button);
 app.component('Message', Message);
 app.component('ProgressSpinner', ProgressSpinner);
 app.component('Card', Card);
+app.component('Fieldset', Fieldset);
+app.component('Select', Select);
 
 
 app.mount('#app');
