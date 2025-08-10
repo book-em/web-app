@@ -22,9 +22,10 @@ const formPasswordDTO = ref<UserChangePasswordDTO>({
     newPassword: "",
     newPasswordConfirm: "",
 });
-const error = ref('');
 const warning = ref('');
+const error = ref('');
 const errorDelete = ref('');
+const errorPassword = ref('');
 const formDetailsLoading = ref(false);
 const formPasswordLoading = ref(false);
 const formDeleteLoading = ref(false);
@@ -73,27 +74,27 @@ const doChangePassword = () => {
     const dto = formPasswordDTO.value;
 
     if (dto.newPassword != dto.newPasswordConfirm) {
-        error.value = "Passwords do not match";
+        errorPassword.value = "Passwords do not match";
         return;
     }
     if (dto.oldPassword == dto.newPassword) {
-        error.value = "New password must be different";
+        errorPassword.value = "New password must be different";
         return;
     }
 
-    error.value = "";
+    errorPassword.value = "";
     formPasswordLoading.value = true;
 
     UserAPI.changePassword(dto).then((_: AxiosResponse<null>) => {
     }).catch((err: AxiosError) => {
         if (err.response?.status == 400) {
             console.error(err);
-            error.value = "Could not change password";
+            errorPassword.value = "Could not change password";
         } else if (err.response?.status == 401) {
-            error.value = "Wrong password";
+            errorPassword.value = "Wrong password";
         } else {
             console.error(err);
-            error.value = "Unknown error. Check the console";
+            errorPassword.value = "Unknown error. Check the console";
         }
     }).finally(() => {
         formPasswordLoading.value = false;
@@ -130,12 +131,30 @@ const doDeleteUser = () => {
     <Form @submit.prevent="doUpdateUserInfo" class="center">
         <div class="form-div">
             <Fieldset legend="Your settings">
-                <InputText type="text" placeholder="Username" @input="duringUsernameChange"
-                    v-model.trim="formDTO!.username" fluid />
-                <InputText type="email" placeholder="user@email.com" v-model.trim="formDTO!.email" fluid />
-                <InputText type="text" placeholder="Name" v-model.trim="formDTO!.name" fluid />
-                <InputText type="text" placeholder="Surname" v-model.trim="formDTO!.surname" fluid />
-                <InputText type="text" placeholder="Address" v-model.trim="formDTO!.address" fluid />
+                <FloatLabel variant="in">
+                    <InputText type="text" @input="duringUsernameChange" v-model.trim="formDTO!.username" fluid />
+                    <label>Username</label>
+                </FloatLabel>
+
+                <FloatLabel variant="in">
+                    <InputText type="email" v-model.trim="formDTO!.email" fluid />
+                    <label>Email</label>
+                </FloatLabel>
+
+                <FloatLabel variant="in">
+                    <InputText type="text" v-model.trim="formDTO!.name" fluid />
+                    <label>Name</label>
+                </FloatLabel>
+
+                <FloatLabel variant="in">
+                    <InputText type="text" v-model.trim="formDTO!.surname" fluid />
+                    <label>Surname</label>
+                </FloatLabel>
+
+                <FloatLabel variant="in">
+                    <InputText type="text" v-model.trim="formDTO!.address" fluid />
+                    <label>Address</label>
+                </FloatLabel>
 
                 <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
                 <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
@@ -151,14 +170,23 @@ const doDeleteUser = () => {
     <Form @submit.prevent="doChangePassword" class="center">
         <div class="form-div">
             <Fieldset legend="Change password">
-                <InputText type="password" placeholder="Old password" v-model.trim="formPasswordDTO!.oldPassword"
-                    fluid />
-                <InputText type="password" placeholder="New password" v-model.trim="formPasswordDTO!.newPassword"
-                    fluid />
-                <InputText type="password" placeholder="Confirm password"
-                    v-model.trim="formPasswordDTO!.newPasswordConfirm" fluid />
+                <FloatLabel variant="in">
+                    <InputText type="password" v-model.trim="formPasswordDTO!.oldPassword" fluid />
+                    <label>Old password</label>
+                </FloatLabel>
 
-                <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
+                <FloatLabel variant="in">
+                    <InputText type="password" v-model.trim="formPasswordDTO!.newPassword" fluid />
+                    <label>New password</label>
+                </FloatLabel>
+
+                <FloatLabel variant="in">
+                    <InputText type="password" v-model.trim="formPasswordDTO!.newPasswordConfirm" fluid />
+                    <label>Confirm password</label>
+                </FloatLabel>
+
+                <Message v-show="errorPassword.length > 0" severity="error" size="small" variant="simple">{{
+                    errorPassword }}</Message>
 
                 <Button class="btn" type="submit" severity="info" :disabled="formPasswordLoading">
                     Change password
