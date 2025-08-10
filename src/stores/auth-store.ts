@@ -8,7 +8,7 @@ export const useAuthStore = defineStore('auth', {
         token: '' as string,
         id: -1 as number,
         username: "" as string,
-        role: "" as UserRole,
+        role: "" as UserRole | "",
     }),
     actions: {
         login(jwt: string) {
@@ -24,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
             this.token = '';
             this.username = "";
             this.id = -1;
+            this.role = '';
             clearJWT();
         },
         checkLocalStorage() {

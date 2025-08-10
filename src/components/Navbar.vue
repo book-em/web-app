@@ -1,30 +1,113 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useAuthStore } from '../stores/auth-store';
+import type { MenuItem } from 'primevue/menuitem';
+import { UserRole } from '../api/user.api';
+import { useRouter } from 'vue-router';
 
 const auth = useAuthStore();
+const navbarItems = ref<MenuItem[]>([]);
+const router = useRouter();
 
 onMounted(() => {
     auth.checkLocalStorage();
+    computeNavbar();
+});
+
+watch(() => auth.role, (newValue, oldValue) => {
+    computeNavbar();
+});
+watch(() => auth.isLoggedIn, (newValue, oldValue) => {
+    computeNavbar();
+});
+watch(() => auth.id, (newValue, oldValue) => {
+    computeNavbar();
 });
 
 const logOut = () => {
     auth.logout();
+    router.push("/login");
+};
+
+const computeNavbar = () => {
+    navbarItems.value = [];
+    navbarItems.value.push({ label: "Book'em", icon: 'pi pi-home', command: () => goto('/') });
+
+    const goto = (to: string) => {
+        router.push(to);
+    }
+
+    if (auth.isLoggedIn) {
+        navbarItems.value.push({
+            label: auth.username,
+            icon: 'pi pi-user',
+            items: [
+                { label: 'Settings', icon: 'pi pi-cog', command: () => goto('/my-settings') },
+                { label: 'Log out', icon: 'pi pi-sign-out', command: () => logOut() },
+            ]
+        });
+    } else {
+        navbarItems.value.push({ label: 'Log in', icon: 'pi pi-user', command: () => goto('/login') });
+        navbarItems.value.push({ label: 'Register', icon: 'pi pi-user-plus', command: () => goto('/register') });
+    }
+
+    if (auth.isLoggedIn) {
+
+        switch (auth.role) {
+            case UserRole.Admin:
+                break;
+            case UserRole.Guest:
+                navbarItems.value.push({ label: 'My Reservations', icon: 'pi pi-book', command: () => goto('/') });
+                navbarItems.value.push({ label: 'History', icon: 'pi pi-history', command: () => goto('/') });
+                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/') });
+                break;
+            case UserRole.Host:
+                navbarItems.value.push({ label: 'My Rooms', icon: 'pi pi-building', command: () => goto('/') });
+                navbarItems.value.push({ label: 'Reservations', icon: 'pi pi-address-book', command: () => goto('/') });
+                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/') });
+                navbarItems.value.push({ label: 'Ratings', icon: 'pi pi-star', command: () => goto('/') });
+                break;
+        }
+    }
+
+    console.log(auth.role);
 }
+
+const menubarClass = computed(() => {
+    switch (auth.role) {
+        case UserRole.Admin:
+            return 'menubar-admin';
+        case UserRole.Guest:
+            return 'menubar-guest';
+        case UserRole.Host:
+            return 'menubar-host';
+        default:
+            return 'menubar-default';
+    }
+});
 
 </script>
 
 <template>
     <nav class="navbar">
-        <RouterLink to="/"><strong>Book'em</strong></RouterLink>
-
-        <div v-if="!auth.isLoggedIn">
-            <RouterLink to="/login">Login</RouterLink> <br />
-            <RouterLink to="/register">Register</RouterLink> <br />
-        </div>
-        <div v-else>
-            <RouterLink to="/my-settings">{{ auth.username }}</RouterLink> <br />
-            <RouterLink to="/" @click.prevent="logOut">Sign out</RouterLink> <br />
-        </div>
+        <Menubar :model="navbarItems" :class="menubarClass" />
     </nav>
 </template>
+
+<style lang="css" scoped>
+.menubar-default {
+    background-image: linear-gradient(to right, var(--p-surface-0), var(--p-surface-200));
+}
+
+.menubar-guest {
+    background-image: linear-gradient(to right, var(--p-surface-0), var(--p-blue-100));
+}
+
+.menubar-host {
+    background-image: linear-gradient(to right, var(--p-surface-0), var(--p-yellow-100));
+}
+
+.menubar-admin {
+    background-image: linear-gradient(to right, var(--p-surface-0), var(--p-teal-100));
+}
+</style>
