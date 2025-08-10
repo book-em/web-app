@@ -42,7 +42,12 @@ export class UserAPI {
     static update(dto: UserUpdateDTO): Promise<AxiosResponse<null>> {
         return axiosInstance.put(`/update`, dto);
     }
+
     static changePassword(dto: UserChangePasswordDTO): Promise<AxiosResponse<null>> {
         return axiosInstance.put(`/password`, dto);
+    }
+
+    static deleteById(id: number): Promise<AxiosResponse<null>> {
+        return axiosInstance.delete(`/${id}`);
     }
 }
