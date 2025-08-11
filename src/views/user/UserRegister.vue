@@ -140,7 +140,7 @@ const loginAsNewlyCreatedUser = (username: string, password: string) => {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url('bg-houses.jpg');
+    background-image: url('/bg-houses.jpg');
     background-position: center;
     z-index: -100;
     background-position: 8px -22px;
