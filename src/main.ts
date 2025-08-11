@@ -1,4 +1,6 @@
 import { createApp } from 'vue';
+
+import 'primeicons/primeicons.css';
 import './style.css';
 import App from './App.vue';
 import { router } from './router';
@@ -14,8 +16,6 @@ import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
 import Menubar from 'primevue/menubar';
 import FloatLabel from 'primevue/floatlabel';
-import 'primeicons/primeicons.css';
-import 'tailwindcss-primeui';
 
 const app = createApp(App);
 
@@ -28,7 +28,7 @@ app.use(PrimeVue, {
         preset: Aura,
         options: {
             prefix: 'p',
-            darkModeSelector: 'system',
+            darkModeSelector: 'light',
             cssLayer: false
         }
     }
