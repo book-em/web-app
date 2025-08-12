@@ -5,6 +5,7 @@ import type { AxiosError, AxiosResponse } from 'axios';
 import { useAuthStore } from '../../stores/auth-store';
 import { useRouter } from 'vue-router';
 import { RoomAPI, type RoomCreateDTO, type RoomDTO } from '../../api/room.api';
+import type { FileUploadSelectEvent } from 'primevue/fileupload';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -23,6 +24,25 @@ const formDTO = ref<RoomCreateDTO>({
 const warning = ref('');
 const error = ref('');
 const formLoading = ref(false);
+
+const handleFiles = (event: FileUploadSelectEvent) => {
+    const files = event.files as File[];
+
+    files.forEach((file: File) => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result as string;
+                formDTO.value!.photosPayload.push(result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+const removeImage = (index: number) => {
+    formDTO.value!.photosPayload.splice(index, 1);
+}
 
 onMounted(() => {
     auth.checkLocalStorage();
@@ -93,6 +113,27 @@ const doCreate = () => {
                 <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
                 </Message>
 
+                <div class="image-uploader">
+                    <FileUpload
+                        name="images[]"
+                        mode="basic"
+                        accept="image/png,image/jpg,image/jpeg"
+                        multiple
+                        customUpload
+                        @select="handleFiles"
+                        :auto="false"
+                        chooseLabel="Upload Images"
+                        class="p-mb-3"
+                        />
+
+                    <div class="preview-grid">
+                        <div v-for="(img, index) in formDTO.photosPayload" :key="index" class="preview-item">
+                            <Image :src="img" alt="Preview" preview />
+                            <button type="button" @click="removeImage(index)" :disabled="formLoading">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
                 <Button class="btn" type="submit" severity="success" :disabled="formLoading">
                     Create
                 </Button>
@@ -143,12 +184,47 @@ h2 {
     flex: 1;
 }
 
-
 :deep(.panic .p-fieldset-legend-label) {
     color: var(--p-red-500);
 }
 
 .panic button {
     float: right;
+}
+
+.preview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.preview-item {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-item :deep(.p-image img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+.preview-item button {
+    position: absolute;
+    top: 16px;
+    right: 4px;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
 }
 </style>
