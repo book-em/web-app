@@ -10,7 +10,7 @@ import Aura from '@primeuix/themes/aura';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { FileUpload, Image, ProgressSpinner } from 'primevue';
+import { AutoComplete, FileUpload, Image, ProgressSpinner } from 'primevue';
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
@@ -46,5 +46,6 @@ app.component('FloatLabel', FloatLabel);
 app.component('InputNumber', InputNumber);
 app.component('Image', Image);
 app.component('FileUpload', FileUpload);
+app.component('AutoComplete', AutoComplete);
 
 app.mount('#app');
