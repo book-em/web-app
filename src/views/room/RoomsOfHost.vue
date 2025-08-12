@@ -100,6 +100,7 @@ onMounted(() => findByHostId());
 
     background-color: var(--p-color-text);
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1em;
 }
 
 .flex-items:nth-child(1) {
@@ -110,6 +111,7 @@ onMounted(() => findByHostId());
     align-self: auto;
     order: 0;
     margin: 20px;
+    min-width: 20%;
 }
 
 .flex-items:nth-child(2) {
