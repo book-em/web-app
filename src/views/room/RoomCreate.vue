@@ -25,6 +25,22 @@ const warning = ref('');
 const error = ref('');
 const formLoading = ref(false);
 
+const validateForm = (): string => {
+    const isEmpty = (s: string) => {
+        return s == null || s == undefined || s.trim().length == 0;
+    }
+
+    if (isEmpty(formDTO.value.name)) return "Name must not be empty";
+    if (isEmpty(formDTO.value.address)) return "Address must not be empty";
+    if (formDTO.value.commodities.length == 0) return "At least one commodity is required";
+    if (formDTO.value.photosPayload.length == 0) return "At least one photograph is required";
+    if (formDTO.value.minGuests < 0) return "The room needs to support at least one person";
+    if (formDTO.value.maxGuests < 0) return "The room needs to support at least one person";
+    if (formDTO.value.minGuests > formDTO.value.maxGuests) return "Min guests and max guests are reversed";
+
+    return "";
+}
+
 const handleFiles = (event: FileUploadSelectEvent) => {
     const files = event.files as File[];
 
@@ -55,8 +71,13 @@ onMounted(() => {
 });
 
 const doCreate = () => {
-    let dto = {...formDTO.value};
+    let dto = { ...formDTO.value };
     dto.hostID = user.value.id;
+
+    error.value = validateForm();
+    if (error.value != "") {
+        return;
+    }
 
     error.value = "";
     formLoading.value = true;
@@ -109,37 +130,32 @@ const doCreate = () => {
                     <label>Max guests</label>
                 </FloatLabel>
 
-                <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
-                <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
-                </Message>
 
                 <FloatLabel variant="in">
-                    <AutoComplete v-model="formDTO!.commodities" multiple fluid class="full-w" @keydown.enter.prevent :typeahead="false" />
-                    <label>Commodities</label>
+                    <AutoComplete v-model="formDTO!.commodities" multiple fluid class="full-w" @keydown.enter.prevent
+                        :typeahead="false" />
+                    <label>Commodities (e.g. WiFi, Kitchen, Free Parking)</label>
                 </FloatLabel>
 
-                <Fieldset legend="Photographs">          
+                <Fieldset legend="Photographs">
                     <div class="image-uploader">
-                        <FileUpload
-                            name="images[]"
-                            mode="basic"
-                            accept="image/png,image/jpg,image/jpeg"
-                            multiple
-                            customUpload
-                            @select="handleFiles"
-                            :auto="false"
-                            chooseLabel="Upload Images"
-                            class="p-mb-3"
-                            />
+                        <FileUpload name="images[]" mode="basic" accept="image/png,image/jpg,image/jpeg" multiple
+                            customUpload @select="handleFiles" :auto="false" chooseLabel="Upload Images"
+                            class="p-mb-3" />
 
                         <div class="preview-grid">
                             <div v-for="(img, index) in formDTO.photosPayload" :key="index" class="preview-item">
                                 <Image :src="img" alt="Preview" preview />
-                                <button type="button" @click="removeImage(index)" :disabled="formLoading">Remove</button>
+                                <button type="button" @click="removeImage(index)"
+                                    :disabled="formLoading">Remove</button>
                             </div>
                         </div>
                     </div>
                 </Fieldset>
+
+                <Message v-show="error.length > 0" severity="error" size="small" variant="simple">{{ error }}</Message>
+                <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
+                </Message>
 
                 <Button class="btn" type="submit" severity="help" :disabled="formLoading">
                     Create Room
@@ -242,5 +258,4 @@ h2 {
 .btn {
     float: right;
 }
-
 </style>
