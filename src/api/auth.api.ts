@@ -1,4 +1,4 @@
-import axiosInstance from "./util"
+import { axiosInstance } from "./util"
 import type { AxiosResponse } from "axios"
 import type { UserDTO, UserRole } from "./user.api"
 

@@ -1,5 +1,5 @@
 import type { AxiosResponse } from "axios"
-import axiosInstance from "./util"
+import { axiosInstance } from "./util"
 
 export enum UserRole {
     Guest = "guest",
