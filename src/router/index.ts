@@ -8,6 +8,7 @@ import { UserRole } from '../api/user.api';
 import { useAuthStore } from '../stores/auth-store';
 import type { RouteRecordRaw } from 'vue-router';
 import RoomCreate from '../views/room/RoomCreate.vue';
+import RoomDetails from '../views/room/RoomDetails.vue';
 
 /**
  * A special type for route guards.
@@ -35,6 +36,7 @@ const routes: RouteRecordRaw[] = [
     { path: "/my-settings", component: UserSettings, meta: { role: "signed-in" } },
 
     { path: '/new-room', component: RoomCreate, meta: { role: [UserRole.Host] } },
+    { path: '/room/:id', component: RoomDetails, meta: { role: 'all' } },
 ];
 
 export const router = createRouter({
