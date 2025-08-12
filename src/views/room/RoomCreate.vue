@@ -81,7 +81,7 @@ const doCreate = () => {
 </script>
 
 <template>
-    <Form @submit.prevent="doCreate" class="center">
+    <form @submit.prevent="doCreate" class="center">
         <div class="form-div">
             <Fieldset legend="Create new room">
                 <FloatLabel variant="in">
@@ -113,39 +113,46 @@ const doCreate = () => {
                 <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
                 </Message>
 
-                <div class="image-uploader">
-                    <FileUpload
-                        name="images[]"
-                        mode="basic"
-                        accept="image/png,image/jpg,image/jpeg"
-                        multiple
-                        customUpload
-                        @select="handleFiles"
-                        :auto="false"
-                        chooseLabel="Upload Images"
-                        class="p-mb-3"
-                        />
+                <FloatLabel variant="in">
+                    <AutoComplete v-model="formDTO!.commodities" multiple fluid class="full-w" @keydown.enter.prevent :typeahead="false" />
+                    <label>Commodities</label>
+                </FloatLabel>
 
-                    <div class="preview-grid">
-                        <div v-for="(img, index) in formDTO.photosPayload" :key="index" class="preview-item">
-                            <Image :src="img" alt="Preview" preview />
-                            <button type="button" @click="removeImage(index)" :disabled="formLoading">Remove</button>
+                <Fieldset legend="Photographs">          
+                    <div class="image-uploader">
+                        <FileUpload
+                            name="images[]"
+                            mode="basic"
+                            accept="image/png,image/jpg,image/jpeg"
+                            multiple
+                            customUpload
+                            @select="handleFiles"
+                            :auto="false"
+                            chooseLabel="Upload Images"
+                            class="p-mb-3"
+                            />
+
+                        <div class="preview-grid">
+                            <div v-for="(img, index) in formDTO.photosPayload" :key="index" class="preview-item">
+                                <Image :src="img" alt="Preview" preview />
+                                <button type="button" @click="removeImage(index)" :disabled="formLoading">Remove</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </Fieldset>
 
-                <Button class="btn" type="submit" severity="success" :disabled="formLoading">
-                    Create
+                <Button class="btn" type="submit" severity="help" :disabled="formLoading">
+                    Create Room
                 </Button>
             </Fieldset>
         </div>
-    </Form>
+    </form>
 </template>
 
 <style lang="css" scoped>
 .center {
     margin: auto;
-    width: 60%;
+    width: 70%;
     margin-top: 1em;
 }
 
@@ -227,4 +234,13 @@ h2 {
     border-radius: 4px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
 }
+
+.full-w {
+    min-width: 100%;
+}
+
+.btn {
+    float: right;
+}
+
 </style>
