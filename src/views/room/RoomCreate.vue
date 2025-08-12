@@ -62,7 +62,7 @@ const doCreate = () => {
     formLoading.value = true;
 
     RoomAPI.create(dto).then((res: AxiosResponse<RoomDTO>) => {
-        console.log(res.data);
+        router.push(`/room/${res.data.id}`);
     }).catch((err: AxiosError) => {
         if (err.response?.status == 400) {
             console.error(err);
@@ -219,7 +219,7 @@ h2 {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    }
+}
 
 .preview-item button {
     position: absolute;
