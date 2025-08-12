@@ -16,7 +16,7 @@ const formLoading = ref(false);
 
 const loadRoom = () => {
     const roomId: number = parseInt(route.params.id as string);
-    
+
     RoomAPI.findById(roomId).then((res: AxiosResponse<RoomDTO>) => {
         room.value = res.data;
     }).catch((err: AxiosError) => {
@@ -29,26 +29,27 @@ onMounted(() => loadRoom());
 </script>
 
 <template>
-   
-<div v-if="room != null">
-    
-    {{ room.name }}<br />
-    {{ room.description }}<br />
-    {{ room.address }}<br />    
-    {{ room.minGuests }} - {{ room.maxGuests }} people<br />
-    <span v-for="commodity in room.commodities">{{commodity}}</span> <br />
 
-    <div class="preview-grid">
-        <div v-for="img in room.photos" class="preview-item">
-            <Image :src="`http://localhost:8505/img/${img}`" preview></Image>
+    <div v-if="room != null">
+
+        {{ room.name }}<br />
+        {{ room.description }}<br />
+        {{ room.address }}<br />
+        {{ room.minGuests }} - {{ room.maxGuests }} people<br />
+        <ul>
+            <li v-for="commodity in room.commodities">{{ commodity }}</li> <br />
+        </ul>
+
+        <div class="preview-grid">
+            <div v-for="img in room.photos" class="preview-item">
+                <Image :src="`http://localhost:8505/img/${img}`" preview></Image>
+            </div>
         </div>
     </div>
-</div>
 
 </template>
 
 <style lang="css" scoped>
-
 .preview-grid {
     display: flex;
     flex-wrap: wrap;
@@ -70,5 +71,4 @@ onMounted(() => loadRoom());
     height: 100%;
     object-fit: cover;
 }
-
 </style>

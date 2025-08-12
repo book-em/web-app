@@ -64,7 +64,7 @@ const computeNavbar = () => {
                 break;
             case UserRole.Host:
                 navbarItems.value.push({ label: 'New Room', icon: 'pi pi-plus-circle', command: () => goto('/new-room') });
-                navbarItems.value.push({ label: 'My Rooms', icon: 'pi pi-building', command: () => goto('/') });
+                navbarItems.value.push({ label: 'My Rooms', icon: 'pi pi-building', command: () => goto('/my-rooms') });
                 navbarItems.value.push({ label: 'Reservations', icon: 'pi pi-address-book', command: () => goto('/') });
                 navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/') });
                 navbarItems.value.push({ label: 'Ratings', icon: 'pi pi-star', command: () => goto('/') });
