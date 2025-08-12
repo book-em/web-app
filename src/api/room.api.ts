@@ -32,4 +32,8 @@ export class RoomAPI {
     static findById(id: number): Promise<AxiosResponse<RoomDTO>> {
         return axiosInstanceRooms.get(`/${id}`);
     }
+
+    static findByHostId(hostId: number): Promise<AxiosResponse<RoomDTO[]>> {
+        return axiosInstanceRooms.get(`/host/${hostId}`);
+    }
 }
