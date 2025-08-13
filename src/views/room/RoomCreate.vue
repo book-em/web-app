@@ -21,6 +21,7 @@ const formDTO = ref<RoomCreateDTO>({
     commodities: []
 });
 
+const errorCommodity = ref('');
 const warning = ref('');
 const error = ref('');
 const formLoading = ref(false);
@@ -99,6 +100,23 @@ const doCreate = () => {
     });
 }
 
+const commoditiesIsInvalid = () => {
+    const max_length = 20;
+
+    for (let index = 0; index < formDTO.value.commodities.length; index++) {
+        const element = formDTO.value.commodities[index];
+
+        if (element.length > max_length) {
+            errorCommodity.value = `Commodity ${element} description is too long`;
+            return true;
+        } else {
+        }
+    }
+
+    errorCommodity.value = '';
+    return false;
+}
+
 </script>
 
 <template>
@@ -106,35 +124,39 @@ const doCreate = () => {
         <div class="form-div">
             <Fieldset legend="Create new room">
                 <FloatLabel variant="in">
-                    <InputText type="text" v-model.trim="formDTO!.name" fluid />
+                    <InputText type="text" v-model.trim="formDTO!.name" :maxlength="50" fluid />
                     <label>Name</label>
                 </FloatLabel>
 
                 <FloatLabel variant="in">
-                    <InputText type="text" v-model.trim="formDTO!.description" fluid />
+                    <InputText type="text" v-model.trim="formDTO!.description" :maxlength="150" fluid />
                     <label>Description</label>
                 </FloatLabel>
 
                 <FloatLabel variant="in">
-                    <InputText type="text" v-model.trim="formDTO!.address" fluid />
+                    <InputText type="text" v-model.trim="formDTO!.address" :maxlength="150" fluid />
                     <label>Address</label>
                 </FloatLabel>
 
-                <FloatLabel variant="in">
-                    <InputNumber :min="1" :max="formDTO!.maxGuests" v-model.trim="formDTO!.minGuests" fluid />
-                    <label>Min guests</label>
-                </FloatLabel>
+                <div class="inline-fields">
+                    <FloatLabel variant="in">
+                        <InputNumber :min="1" :max="formDTO!.maxGuests" v-model.trim="formDTO!.minGuests" fluid />
+                        <label>Minimum number of guests</label>
+                    </FloatLabel>
 
-                <FloatLabel variant="in">
-                    <InputNumber :min="formDTO!.minGuests" v-model.trim="formDTO!.maxGuests" fluid />
-                    <label>Max guests</label>
-                </FloatLabel>
-
+                    <FloatLabel variant="in">
+                        <InputNumber :min="formDTO!.minGuests" :max="100" v-model.trim="formDTO!.maxGuests" fluid />
+                        <label>Maximum number of guests (up to 100)</label>
+                    </FloatLabel>
+                </div>
 
                 <FloatLabel variant="in">
                     <AutoComplete v-model="formDTO!.commodities" multiple fluid class="full-w" @keydown.enter.prevent
-                        :typeahead="false" />
+                        :typeahead="false" :invalid="commoditiesIsInvalid()" />
                     <label>Commodities (e.g. WiFi, Kitchen, Free Parking)</label>
+                    <Message v-show="errorCommodity.length > 0" severity="error" size="small" variant="simple">{{
+                        errorCommodity }}</Message>
+
                 </FloatLabel>
 
                 <Fieldset legend="Photographs">
@@ -157,7 +179,7 @@ const doCreate = () => {
                 <Message v-show="warning.length > 0" severity="warn" size="small" variant="simple">{{ warning }}
                 </Message>
 
-                <Button class="btn" type="submit" severity="help" :disabled="formLoading">
+                <Button class="btn" type="submit" severity="help" :disabled="formLoading || commoditiesIsInvalid()">
                     Create Room
                 </Button>
             </Fieldset>
@@ -257,5 +279,14 @@ h2 {
 
 .btn {
     float: right;
+}
+
+.inline-fields {
+    display: flex;
+    gap: 1em;
+}
+
+.inline-fields>* {
+    flex: 1;
 }
 </style>
