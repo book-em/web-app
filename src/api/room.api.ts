@@ -6,22 +6,22 @@ export interface RoomDTO {
     hostID: number,
     name: string,
     description: string,
-    address: string
+    address: string,
     minGuests: number,
     maxGuests: number,
     photos: string[],
-    commodities: string[]
+    commodities: string[],
 }
 
 export interface RoomCreateDTO {
     hostID: number,
     name: string,
     description: string,
-    address: string
+    address: string,
     minGuests: number,
     maxGuests: number,
     photosPayload: string[],
-    commodities: string[]
+    commodities: string[],
 }
 
 export class RoomAPI {
