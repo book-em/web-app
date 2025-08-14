@@ -10,13 +10,14 @@ import Aura from '@primeuix/themes/aura';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { AutoComplete, FileUpload, Image, ProgressSpinner } from 'primevue';
+import { AutoComplete, Checkbox, FileUpload, Image, ProgressSpinner } from 'primevue';
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
 import Menubar from 'primevue/menubar';
 import FloatLabel from 'primevue/floatlabel';
 import InputNumber from 'primevue/inputnumber';
+import DatePicker from 'primevue/datepicker';
 
 const app = createApp(App);
 
@@ -47,5 +48,7 @@ app.component('InputNumber', InputNumber);
 app.component('Image', Image);
 app.component('FileUpload', FileUpload);
 app.component('AutoComplete', AutoComplete);
+app.component('DatePicker', DatePicker);
+app.component('Checkbox', Checkbox);
 
 app.mount('#app');
