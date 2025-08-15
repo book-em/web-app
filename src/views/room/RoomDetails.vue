@@ -153,7 +153,7 @@ const formatDate = (date: string) => {
 
                         <!-- Heatmap calendar -->
 
-                        <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="2025" />
+                        <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="new Date().getFullYear()" />
 
                     </div>
 
