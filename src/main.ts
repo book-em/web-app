@@ -18,11 +18,11 @@ import Menubar from 'primevue/menubar';
 import FloatLabel from 'primevue/floatlabel';
 import InputNumber from 'primevue/inputnumber';
 import DatePicker from 'primevue/datepicker';
-
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
+import VueCalendarHeatmap from 'vue3-calendar-heatmap';
 
 const app = createApp(App);
 
@@ -60,5 +60,6 @@ app.component('DataTable', DataTable);
 app.component('Column', Column);
 app.component('ColumnGroup', ColumnGroup);
 app.component('Row', Row);
+app.use(VueCalendarHeatmap);
 
 app.mount('#app');
