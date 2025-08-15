@@ -10,7 +10,7 @@ import Aura from '@primeuix/themes/aura';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { AutoComplete, Checkbox, Divider, FileUpload, Image, ProgressSpinner } from 'primevue';
+import { AutoComplete, Checkbox, Divider, FileUpload, Image, ProgressSpinner, Tag } from 'primevue';
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
@@ -41,6 +41,7 @@ app.use(PrimeVue, {
         }
     }
 });
+app.directive('tooltip', Tooltip);
 app.component('InputText', InputText);
 app.component('Button', Button);
 app.component('Message', Message);
@@ -62,7 +63,7 @@ app.component('Column', Column);
 app.component('ColumnGroup', ColumnGroup);
 app.component('Row', Row);
 app.component('BlockUI', BlockUI);
-app.directive('tooltip', Tooltip);
+app.component('Tag', Tag);
 
 
 app.mount('#app');
