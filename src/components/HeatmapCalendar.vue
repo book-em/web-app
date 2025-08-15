@@ -34,22 +34,43 @@ const props = defineProps({
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-const buildAvailabilityMap = (items) => {
+function buildAvailabilityMap(items) {
     const map = {};
+
     items.forEach(item => {
         const start = new Date(item.dateFrom);
         const end = new Date(item.dateTo);
-        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+
+        start.setHours(0, 0, 0, 0);
+        end.setDate(end.getDate() + 1); // HACK: It doesn't want to include the last day, so we do last day+1.
+
+        const rangeLength = Math.floor((end.getTime() - start.getTime()) / 86400000) + 1;
+
+        for (let i = 0; i < rangeLength; i++) {
+            const d = new Date(start.getTime() + i * 86400000);
             const iso = d.toISOString().split('T')[0];
-            map[iso] = item.available;
+
+            if (!map[iso] || rangeLength < map[iso].rangeLength) {
+                map[iso] = {
+                    status: item.available,
+                    rangeLength
+                };
+            }
         }
     });
-    return map;
+
+    // Flatten to just status
+    const flatMap = {};
+    Object.keys(map).forEach(date => {
+        flatMap[date] = map[date].status;
+    });
+
+    return flatMap;
 }
 
 const weeks = computed(() => {
     const start = new Date(props.year, 0, 1);
-    const end = new Date(props.year + 1, 0, 1);
+    const end = new Date(props.year + 1, 0, 1); // HACK: It doesn't want to include the last day, so we do last day+1.
     const availabilityMap = buildAvailabilityMap(props.availabilityItems);
 
     const allDays = [];
@@ -84,7 +105,7 @@ const weeks = computed(() => {
     return weekBuckets;
 });
 
-const fillWeek = (week) => {
+const fillWeek = (week): object => {
     // Fill missing weekdays with null to keep grid aligned
     const filled = {};
     weekdays.forEach(day => {
@@ -93,11 +114,12 @@ const fillWeek = (week) => {
     return filled;
 }
 
-const getStatusClass = (status: boolean | null) => {
+const getStatusClass = (status: boolean | null): string => {
     if (status === true) return 'available';
     if (status === false) return 'disabled';
     return 'nodata';
 }
+
 </script>
 
 <style scoped>
