@@ -35,6 +35,7 @@ const loadRoomAvailability = () => {
     const roomId: number = parseInt(route.params.id as string);
 
     RoomAPI.findCurrentAvailabilityListOfRoom(roomId).then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
+        console.log(res.data);
         roomAvailability.value = res.data;
     }).catch((err: AxiosError) => {
         console.error(err);
@@ -68,13 +69,23 @@ const onAddAvailItem = () => {
     }).catch((err: AxiosError) => {
         console.error(err);
     });
-
 }
+
+const removeAvailItem = (id: number) => {
+
+};
+
+const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
+};
 
 </script>
 
 <template>
     <div v-if="room != null">
+        <!-- Details -->
+
         {{ room.name }}<br />
         {{ room.description }}<br />
         {{ room.address }}<br />
@@ -89,46 +100,77 @@ const onAddAvailItem = () => {
             </div>
         </div>
 
-        <div>
-            <h2>Room availability</h2>
+        <!-- Availability form -->
 
-            <div v-if="roomAvailability == null">
-                Nothing
-            </div>
-            <div v-else>
-                <ul>
-                    <li v-for="item in roomAvailability.items">
-                        From {{ new Date(item.dateFrom).toLocaleDateString() }}
-                        to {{ new Date(item.dateTo).toLocaleDateString() }}
-                        <span v-if="!item.available"> disabled </span>
-                    </li>
-                </ul>
-            </div>
+        <div class="p-4">
+            <Card>
+                <template #title>
+                    <h2 class="text-xl font-semibold">Room Availability</h2>
+                </template>
 
-            <form class="center">
-                <div class="inline-fields">
-
-                    <FloatLabel variant="on">
-                        <span> From </span>
-                        <DatePicker v-model="formDateFrom" date-format="dd MM">
-                        </DatePicker>
-                    </FloatLabel>
-
-                    <FloatLabel variant="on">
-                        <span> to </span>
-                        <DatePicker v-model="formDateTo" date-format="dd MM">
-                        </DatePicker>
-                    </FloatLabel>
-
-                    <div class="flex items-center gap-2">
-                        <label>reservations are allowed: </label>
-                        <Checkbox v-model="formAvailable" binary />
+                <template #content>
+                    <div v-if="roomAvailability == null" class="text-gray-500">
+                        <i class="pi pi-info-circle mr-2"></i> No availability data found.
                     </div>
 
-                    <Button v-on:click="onAddAvailItem"><i class="pi pi-plus"></i></Button>
-                </div>
-            </form>
+                    <div v-else>
+                        <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
+                            <Column header="From" field="dateFrom">
+                                <template #body="slotProps">
+                                    {{ formatDate(slotProps.data.dateFrom) }}
+                                </template>
+                            </Column>
 
+                            <Column header="To" field="dateTo">
+                                <template #body="slotProps">
+                                    {{ formatDate(slotProps.data.dateTo) }}
+                                </template>
+                            </Column>
+
+                            <Column header="Can Book?">
+                                <template #body="slotProps">
+                                    <span v-if="slotProps.data.available" class="text-green-600">
+                                        <i class="pi pi-check mr-1"></i> Yes
+
+                                    </span>
+                                    <span v-else class="text-red-500 font-medium">
+                                        <i class="pi pi-ban mr-1"></i> No
+                                    </span>
+                                </template>
+                            </Column>
+
+                            <Column header="Actions">
+                                <template #body="slotProps">
+                                    <Button icon="pi pi-trash" label="Remove" class="p-button-danger p-button-sm"
+                                        @click="removeAvailItem(slotProps.index)" />
+                                </template>
+                            </Column>
+                        </DataTable>
+                    </div>
+
+                    <Divider />
+
+                    <form @submit.prevent="onAddAvailItem" class="flex flex-wrap gap-4 items-end">
+                        <FloatLabel>
+                            <label for="fromDate">From</label>
+                            <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
+                                class="w-full" />
+                        </FloatLabel>
+
+                        <FloatLabel>
+                            <label for="toDate">To</label>
+                            <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon class="w-full" />
+                        </FloatLabel>
+
+                        <div class="flex items-center gap-2">
+                            <label for="available">Reservations allowed:</label>
+                            <Checkbox id="available" v-model="formAvailable" binary />
+                        </div>
+
+                        <Button type="submit" icon="pi pi-plus" label="Add" />
+                    </form>
+                </template>
+            </Card>
         </div>
     </div>
 </template>
