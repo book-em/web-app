@@ -5,6 +5,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { type CreateRoomAvailabilityItemDTO, type CreateRoomAvailabilityListDTO, RoomAPI, type RoomAvailabilityItemDTO, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import HeatmapCalendar from '../../components/HeatmapCalendar.vue';
+import { on } from '@primeuix/themes/aura/floatlabel';
 
 const router = useRouter();
 const route = useRoute();
@@ -150,13 +151,10 @@ const formatDate = (date: string) => {
 
                             <Column header="Can Book?">
                                 <template #body="slotProps">
-                                    <span v-if="slotProps.data.available" class="text-green-600">
-                                        <i class="pi pi-check mr-1"></i> Yes
-
-                                    </span>
-                                    <span v-else class="text-red-500 font-medium">
-                                        <i class="pi pi-ban mr-1"></i> No
-                                    </span>
+                                    <Tag :value="slotProps.data.available ? 'Yes' : 'No'"
+                                        :severity="slotProps.data.available ? 'success' : 'danger'" icon="pi pi-check"
+                                        v-if="slotProps.data.available" />
+                                    <Tag value="No" severity="danger" icon="pi pi-ban" v-else />
                                 </template>
                             </Column>
 
@@ -177,44 +175,51 @@ const formatDate = (date: string) => {
 
                     <Divider />
 
-                    <!-- Edit mode -->
+                    <div class="mt-small">
+                        <!-- Edit mode -->
 
-                    <div v-if="!isEditingRoomAvailability">
-                        <!-- When not editing -->
-                        <Button icon="pi pi-pencil" label="Edit" class="p-button-info"
-                            @click="startEditingRoomAvailability" />
-                    </div>
-                    <div v-else>
-                        <!-- When editing -->
+                        <div v-if="!isEditingRoomAvailability">
+                            <!-- When not editing -->
+                            <Button icon="pi pi-pencil" label="Edit" class="p-button-info"
+                                @click="startEditingRoomAvailability" />
+                        </div>
+                        <div v-else>
+                            <!-- When editing -->
 
-                        <form @submit.prevent="onAddAvailItem" class="flex flex-wrap gap-4 items-end">
-                            <FloatLabel>
-                                <label for="fromDate">From</label>
-                                <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
-                                    class="w-full" />
-                            </FloatLabel>
+                            <h3>Add new availability rule</h3>
 
-                            <FloatLabel>
-                                <label for="toDate">To</label>
-                                <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
-                                    class="w-full" />
-                            </FloatLabel>
+                            <form @submit.prevent="onAddAvailItem" class="flex flex-wrap gap-4 items-end">
+                                <FloatLabel class="mt-small">
+                                    <label for="fromDate">From</label>
+                                    <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
+                                        class="w-full" />
+                                </FloatLabel>
 
-                            <div class="flex items-center gap-2">
-                                <label for="available">Reservations allowed:</label>
-                                <Checkbox id="available" v-model="formAvailable" binary />
+                                <FloatLabel class="mt-small">
+                                    <label for="toDate">To</label>
+                                    <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
+                                        class="w-full" />
+                                </FloatLabel>
+
+                                <div class="flex items-center gap-2 mt-small">
+                                    <label for="available" class="mr-small">Reservations allowed during these
+                                        days:</label>
+                                    <Checkbox id="available" v-model="formAvailable" binary />
+                                </div>
+
+                                <Button type="submit" icon="pi pi-plus" label="Add rule" class="mt-small" />
+                            </form>
+
+                            <Divider />
+
+                            <div class="mt-big">
+                                <Button icon="pi pi-undo" label="Cancel editing" class="p-button-danger mr-small"
+                                    @click="cancelEditingRoomAvailability" />
+                                <Button icon="pi pi-send" label="Submit changes" class="p-button-success mr-small"
+                                    @click="submitEditingRoomAvailability" />
                             </div>
 
-                            <Button type="submit" icon="pi pi-plus" label="Add" />
-                        </form>
-
-                        <Divider />
-
-                        <Button icon="pi pi-send" label="Submit" class="p-button-success"
-                            @click="submitEditingRoomAvailability" />
-                        <Button icon="pi pi-undo" label="Cancel" class="p-button-danger"
-                            @click="cancelEditingRoomAvailability" />
-
+                        </div>
                     </div>
                 </template>
             </Card>
@@ -274,5 +279,17 @@ const formatDate = (date: string) => {
 
 .inline-fields>* {
     flex: 1;
+}
+
+.mt-small {
+    margin-top: 2em;
+}
+
+.mt-big {
+    margin-top: 5em;
+}
+
+.mr-small {
+    margin-right: 1em;
 }
 </style>
