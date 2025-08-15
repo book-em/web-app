@@ -19,6 +19,9 @@ const formDateFrom = ref<Date>(new Date());
 const formDateTo = ref<Date>(new Date());
 const formAvailable = ref(true);
 
+const errorAvailabilityNew = ref('');
+const errorAvailability = ref('');
+
 onMounted(() => loadRoom());
 
 const loadRoom = () => {
@@ -55,6 +58,32 @@ const onAddAvailItem = () => {
         }
     }
 
+    errorAvailabilityNew.value = "";
+
+    {
+        const from = formDateFrom.value;
+        const to = formDateTo.value;
+
+        const datesEqualWithoutYear = (d1: Date, d2: Date): boolean => {
+            return d1.getMonth() == d2.getMonth() && d1.getDate() == d2.getDate();
+        }
+
+        for (let index = 0; index < roomAvailability.value.items.length; index++) {
+            const element = roomAvailability.value.items[index];
+
+            const from2 = new Date(element.dateFrom);
+            const to2 = new Date(element.dateTo);
+
+            if (datesEqualWithoutYear(from, from2) && datesEqualWithoutYear(to, to2)) {
+                console.log(from, from2);
+                console.log(to, to2);
+                errorAvailabilityNew.value = "A rule with this date range already exists";
+                return;
+            }
+        }
+
+    }
+
     let itemsList: RoomAvailabilityItemDTO[] = [...roomAvailability.value.items];
     itemsList.push({
         id: 0,
@@ -81,10 +110,13 @@ const submitEditingRoomAvailability = () => {
         items: roomAvailability.value.items
     };
 
+    errorAvailability.value = "";
+
     RoomAPI.updateAvailability(createRoomAvailability).then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
         roomAvailability.value = res.data;
         isEditingRoomAvailability.value = false;
     }).catch((err: AxiosError) => {
+        errorAvailability.value = err.message.toString();
         console.error(err);
     });
 }
@@ -227,15 +259,26 @@ const galleryResponsiveOptions = ref([
                                     <Checkbox id="available" v-model="formAvailable" binary />
                                 </div>
 
+                                <Message v-show="errorAvailabilityNew.length > 0" severity="error" size="small"
+                                    variant="simple">
+                                    {{ errorAvailabilityNew }}
+                                </Message>
+
                                 <Button type="submit" icon="pi pi-plus" label="Add rule" class="mt-small" />
                             </form>
 
                             <Divider />
 
                             <div class="mt-big">
+                                <Message v-show="errorAvailability.length > 0" severity="error" size="small"
+                                    variant="simple">
+                                    {{ errorAvailability }}
+                                </Message>
+
                                 <Button icon="pi pi-undo" label="Cancel editing" class="p-button-danger mr-small"
                                     @click="cancelEditingRoomAvailability" />
-                                <Button icon="pi pi-send" label="Submit changes" class="p-button-success mr-small"
+                                <Button :disabled="errorAvailability.length > 0" icon="pi pi-send"
+                                    label="Submit changes" class="p-button-success mr-small"
                                     @click="submitEditingRoomAvailability" />
                             </div>
 
