@@ -24,6 +24,7 @@ import ColumnGroup from 'primevue/columngroup';
 import Row from 'primevue/row';
 import Tooltip from 'primevue/tooltip';
 import BlockUI from 'primevue/blockui';
+import Galleria from 'primevue/galleria';
 
 const app = createApp(App);
 
@@ -64,6 +65,6 @@ app.component('ColumnGroup', ColumnGroup);
 app.component('Row', Row);
 app.component('BlockUI', BlockUI);
 app.component('Tag', Tag);
-
+app.component('Galleria', Galleria);
 
 app.mount('#app');

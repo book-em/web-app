@@ -99,6 +99,17 @@ const formatDate = (date: string) => {
     return d.toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
 };
 
+const galleryResponsiveOptions = ref([
+    {
+        breakpoint: '1300px',
+        numVisible: 4
+    },
+    {
+        breakpoint: '575px',
+        numVisible: 1
+    }
+]);
+
 </script>
 
 <template>
@@ -114,11 +125,20 @@ const formatDate = (date: string) => {
             <li v-for="commodity in room.commodities">{{ commodity }}</li> <br />
         </ul>
 
-        <div class="preview-grid">
-            <div v-for="img in room.photos" class="preview-item">
-                <Image :src="`http://localhost:8505/img/${img}`" preview></Image>
-            </div>
-        </div>
+        <!-- Photographs -->
+
+        <Galleria :value="room.photos" :responsiveOptions="galleryResponsiveOptions" :numVisible="5"
+            containerStyle="max-width: 80%; margin: auto;" class="preview-item">
+            <template #item="slotProps">
+                <Image :src="`http://localhost:8505/img/${slotProps.item}`" preview
+                    style="width: 500px; height: 500px; object-fit: cover; object-position: center;" />
+            </template>
+
+            <template #thumbnail="slotProps">
+                <img :src="`http://localhost:8505/img/${slotProps.item}`" preview
+                    style="width: 100px; height: 100px; object-fit: cover; object-position: center;" />
+            </template>
+        </Galleria>
 
         <!-- Availability -->
 
