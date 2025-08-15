@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/auth-store';
 import { useRoute, useRouter } from 'vue-router';
 import { type CreateRoomAvailabilityItemDTO, type CreateRoomAvailabilityListDTO, RoomAPI, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
+import HeatmapCalendar from '../../components/HeatmapCalendar.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -83,6 +84,7 @@ const formatDate = (date: string) => {
 </script>
 
 <template>
+
     <div v-if="room != null">
         <!-- Details -->
 
@@ -100,7 +102,7 @@ const formatDate = (date: string) => {
             </div>
         </div>
 
-        <!-- Availability form -->
+        <!-- Availability -->
 
         <div class="p-4">
             <Card>
@@ -114,6 +116,8 @@ const formatDate = (date: string) => {
                     </div>
 
                     <div v-else>
+                        <!-- List -->
+
                         <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
                             <Column header="From" field="dateFrom">
                                 <template #body="slotProps">
@@ -146,6 +150,11 @@ const formatDate = (date: string) => {
                                 </template>
                             </Column>
                         </DataTable>
+
+                        <!-- Heatmap calendar -->
+
+                        <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="2025" />
+
                     </div>
 
                     <Divider />
