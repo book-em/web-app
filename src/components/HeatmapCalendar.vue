@@ -10,8 +10,10 @@
             <div v-for="(week, wIndex) in weeks" :key="wIndex" class="week-column">
                 <div v-for="weekday in weekdays" :key="weekday">
                     <div v-if="week[weekday]" :class="['day-square', getStatusClass(week[weekday].status)]"
-                        :title="week[weekday].date"></div>
-                    <div v-else class="day-square empty"></div>
+                        v-tooltip="week[weekday].date">
+                    </div>
+                    <div v-else class="day-square empty">
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,7 +44,7 @@ function buildAvailabilityMap(items) {
         const end = new Date(item.dateTo);
 
         start.setHours(0, 0, 0, 0);
-        end.setDate(end.getDate() + 1); // HACK: It doesn't want to include the last day, so we do last day+1.
+        end.setDate(end.getDate()); // HACK: It doesn't want to include the last day, so we do last day+1.
 
         const rangeLength = Math.floor((end.getTime() - start.getTime()) / 86400000) + 1;
 
@@ -70,17 +72,19 @@ function buildAvailabilityMap(items) {
 
 const weeks = computed(() => {
     const start = new Date(props.year, 0, 1);
-    const end = new Date(props.year + 1, 0, 1); // HACK: It doesn't want to include the last day, so we do last day+1.
+    const end = new Date(props.year, 11, 31); // HACK: It doesn't want to include the last day, so we do last day+1.
     const availabilityMap = buildAvailabilityMap(props.availabilityItems);
 
     const allDays = [];
 
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const iso = d.toISOString().split('T')[0];
+        const dateString = d.toLocaleDateString(undefined, { day: 'numeric', month: 'long' });
+
         const weekdayIndex = d.getDay(); // 0 = Sunday
         const weekday = weekdayIndex === 0 ? 'Sun' : weekdays[weekdayIndex - 1];
         allDays.push({
-            date: iso,
+            date: dateString,
             weekday,
             status: availabilityMap[iso] ?? null
         });
