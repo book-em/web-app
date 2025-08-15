@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useAuthStore } from '../../stores/auth-store';
 import { useRoute, useRouter } from 'vue-router';
-import { type CreateRoomAvailabilityItemDTO, type CreateRoomAvailabilityListDTO, RoomAPI, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
+import { type CreateRoomAvailabilityItemDTO, type CreateRoomAvailabilityListDTO, RoomAPI, type RoomAvailabilityItemDTO, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import HeatmapCalendar from '../../components/HeatmapCalendar.vue';
 
@@ -11,15 +11,14 @@ const route = useRoute();
 const auth = useAuthStore();
 const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
+const roomAvailabilityBeforeEdit = ref<RoomAvailabilityListDTO | null>(null);
+const isEditingRoomAvailability = ref(false);
 
 const formDateFrom = ref<Date>(new Date());
 const formDateTo = ref<Date>(new Date());
 const formAvailable = ref(true);
 
-
-const warning = ref('');
-const error = ref('');
-const formLoading = ref(false);
+onMounted(() => loadRoom());
 
 const loadRoom = () => {
     const roomId: number = parseInt(route.params.id as string);
@@ -43,38 +42,56 @@ const loadRoomAvailability = () => {
     });
 }
 
-onMounted(() => loadRoom());
-
 const onAddAvailItem = () => {
     const roomId: number = parseInt(route.params.id as string);
 
-    const itemDTO: CreateRoomAvailabilityItemDTO = {
+    if (roomAvailability.value === null) {
+        roomAvailability.value = {
+            id: 0,
+            effectiveFrom: new Date().toISOString(),
+            items: [],
+            roomId
+        }
+    }
+
+    let itemsList: RoomAvailabilityItemDTO[] = [...roomAvailability.value.items];
+    itemsList.push({
+        id: 0,
         dateFrom: formDateFrom.value.toISOString(),
         dateTo: formDateTo.value.toISOString(),
         available: formAvailable.value,
+    });
+
+    roomAvailability.value.items = itemsList;
+}
+
+const removeAvailItem = (id: number) => {
+    roomAvailability.value.items.splice(id, 1);
+};
+
+const startEditingRoomAvailability = () => {
+    roomAvailabilityBeforeEdit.value = JSON.parse(JSON.stringify(roomAvailability.value)) as RoomAvailabilityListDTO;
+    isEditingRoomAvailability.value = true;
+}
+
+const submitEditingRoomAvailability = () => {
+    const createRoomAvailability: CreateRoomAvailabilityListDTO = {
+        roomId: roomAvailability.value.roomId,
+        items: roomAvailability.value.items
     };
 
-    let listDTO: CreateRoomAvailabilityListDTO = {
-        roomId,
-        items: [itemDTO],
-    };
-
-    if (roomAvailability.value !== null) {
-        listDTO.items = [itemDTO, ...roomAvailability.value.items];
-    }
-
-    // Validate...?
-
-    RoomAPI.updateAvailability(listDTO).then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
+    RoomAPI.updateAvailability(createRoomAvailability).then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
         roomAvailability.value = res.data;
+        isEditingRoomAvailability.value = false;
     }).catch((err: AxiosError) => {
         console.error(err);
     });
 }
 
-const removeAvailItem = (id: number) => {
-
-};
+const cancelEditingRoomAvailability = () => {
+    roomAvailability.value = JSON.parse(JSON.stringify(roomAvailabilityBeforeEdit.value)) as RoomAvailabilityListDTO;
+    isEditingRoomAvailability.value = false;
+}
 
 const formatDate = (date: string) => {
     const d = new Date(date);
@@ -146,7 +163,8 @@ const formatDate = (date: string) => {
                             <Column header="Actions">
                                 <template #body="slotProps">
                                     <Button icon="pi pi-trash" label="Remove" class="p-button-danger p-button-sm"
-                                        @click="removeAvailItem(slotProps.index)" />
+                                        @click="removeAvailItem(slotProps.index)"
+                                        :disabled="!isEditingRoomAvailability" />
                                 </template>
                             </Column>
                         </DataTable>
@@ -159,25 +177,45 @@ const formatDate = (date: string) => {
 
                     <Divider />
 
-                    <form @submit.prevent="onAddAvailItem" class="flex flex-wrap gap-4 items-end">
-                        <FloatLabel>
-                            <label for="fromDate">From</label>
-                            <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
-                                class="w-full" />
-                        </FloatLabel>
+                    <!-- Edit mode -->
 
-                        <FloatLabel>
-                            <label for="toDate">To</label>
-                            <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon class="w-full" />
-                        </FloatLabel>
+                    <div v-if="!isEditingRoomAvailability">
+                        <!-- When not editing -->
+                        <Button icon="pi pi-pencil" label="Edit" class="p-button-info"
+                            @click="startEditingRoomAvailability" />
+                    </div>
+                    <div v-else>
+                        <!-- When editing -->
 
-                        <div class="flex items-center gap-2">
-                            <label for="available">Reservations allowed:</label>
-                            <Checkbox id="available" v-model="formAvailable" binary />
-                        </div>
+                        <form @submit.prevent="onAddAvailItem" class="flex flex-wrap gap-4 items-end">
+                            <FloatLabel>
+                                <label for="fromDate">From</label>
+                                <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
+                                    class="w-full" />
+                            </FloatLabel>
 
-                        <Button type="submit" icon="pi pi-plus" label="Add" />
-                    </form>
+                            <FloatLabel>
+                                <label for="toDate">To</label>
+                                <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
+                                    class="w-full" />
+                            </FloatLabel>
+
+                            <div class="flex items-center gap-2">
+                                <label for="available">Reservations allowed:</label>
+                                <Checkbox id="available" v-model="formAvailable" binary />
+                            </div>
+
+                            <Button type="submit" icon="pi pi-plus" label="Add" />
+                        </form>
+
+                        <Divider />
+
+                        <Button icon="pi pi-send" label="Submit" class="p-button-success"
+                            @click="submitEditingRoomAvailability" />
+                        <Button icon="pi pi-undo" label="Cancel" class="p-button-danger"
+                            @click="cancelEditingRoomAvailability" />
+
+                    </div>
                 </template>
             </Card>
         </div>
