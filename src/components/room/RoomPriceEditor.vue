@@ -158,18 +158,12 @@ const formatDate = (date: string) => {
         <Card>
             <template #content>
                 <div>
-                    <div>
-                        <!-- <HeatmapCalendar :priceItems="roomPriceList?.items ?? []" :year="new Date().getFullYear()" /> -->
-                    </div>
-
                     <div class="availability-layout">
                         <!-- LEFT SIDE: List -->
                         <div class="left-panel">
-
                             <div>
                                 <h3>Base price: ${{ roomPriceList.basePrice }} {{ (roomPriceList.perGuest ? "per guest "
                                     : "") + "per night" }}</h3>
-
 
                                 <DataTable v-if="roomPriceList.items.length > 0" :value="roomPriceList?.items ?? []"
                                     responsiveLayout="scroll" class="mb-4">
