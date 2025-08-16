@@ -126,13 +126,15 @@ const formatDate = (date: string) => {
         <Card>
             <template #content>
                 <div>
-                    <div>
-                        <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="new Date().getFullYear()" />
-                    </div>
 
                     <div class="availability-layout">
                         <!-- LEFT SIDE: List -->
                         <div class="left-panel">
+                            <div>
+                                <HeatmapCalendar :availabilityItems="roomAvailability.items"
+                                    :year="new Date().getFullYear()" />
+                            </div>
+
                             <div v-if="roomAvailability.items.length > 0">
                                 <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
                                     <Column header="From" field="dateFrom"> <template #body="slotProps"> {{
@@ -148,10 +150,12 @@ const formatDate = (date: string) => {
                                             <Tag value="No" severity="danger" icon="pi pi-ban" v-else />
                                         </template>
                                     </Column>
-                                    <Column header="Actions"> <template #body="slotProps"> <Button icon="pi pi-trash"
-                                                label="Remove" class="p-button-danger p-button-sm"
+                                    <Column header="Actions">
+                                        <template #body="slotProps"> <Button icon="pi pi-trash" label="Remove"
+                                                class="p-button-danger p-button-sm"
                                                 @click="removeAvailItem(slotProps.index)"
-                                                :disabled="!isEditingRoomAvailability" /> </template>
+                                                :disabled="!isEditingRoomAvailability" />
+                                        </template>
                                     </Column>
                                 </DataTable>
                             </div>

@@ -145,7 +145,7 @@ const getStatusClass = (status: boolean | null): string => {
 .weekday-label {
     font-size: 12px;
     color: #4b5563;
-    height: 16px;
+    height: 14px;
 }
 
 .calendar-grid {
@@ -160,8 +160,8 @@ const getStatusClass = (status: boolean | null): string => {
 }
 
 .day-square {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 2px;
 }
 
