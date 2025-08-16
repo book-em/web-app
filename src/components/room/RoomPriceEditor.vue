@@ -23,11 +23,13 @@ const formBasePrice = ref<number>(100);
 
 const errorPriceNew = ref("");
 const errorPrice = ref("");
+const loading = ref(false);
 
 onMounted(() => loadRoomPriceList());
 watch(() => props.roomId, () => loadRoomPriceList());
 
 const loadRoomPriceList = () => {
+    loading.value = true;
     RoomAPI.findCurrentPriceListOfRoom(props.roomId)
         .then((res: AxiosResponse<RoomPriceListDTO>) => {
             roomPriceList.value = res.data;
@@ -36,6 +38,8 @@ const loadRoomPriceList = () => {
         })
         .catch((err: AxiosError) => {
             console.error(err);
+        }).finally(() => {
+            loading.value = false;
         });
 };
 
@@ -135,6 +139,7 @@ const submitEditingRoomPriceList = () => {
     };
 
     errorPrice.value = "";
+    loading.value = true;
 
     RoomAPI.updatePriceList(dto)
         .then((res: AxiosResponse<RoomPriceListDTO>) => {
@@ -144,6 +149,8 @@ const submitEditingRoomPriceList = () => {
         .catch((err: AxiosError) => {
             errorPrice.value = err.message.toString();
             console.error(err);
+        }).finally(() => {
+            loading.value = false;
         });
 };
 
@@ -154,6 +161,9 @@ const formatDate = (date: string) => {
 </script>
 
 <template>
+    <div v-if="loading">
+        <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+    </div>
     <div class="p-4" v-if="roomPriceList != null">
         <Card>
             <template #content>
