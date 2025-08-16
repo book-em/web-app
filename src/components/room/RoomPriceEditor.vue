@@ -25,7 +25,10 @@ const errorPriceNew = ref("");
 const errorPrice = ref("");
 const loading = ref(false);
 
-onMounted(() => loadRoomPriceList());
+onMounted(() => {
+    loadRoomPriceList();
+    formDateTo.value.setDate(formDateFrom.value.getDate() + 7);
+});
 watch(() => props.roomId, () => loadRoomPriceList());
 
 const loadRoomPriceList = () => {
@@ -158,6 +161,18 @@ const formatDate = (date: string) => {
     const d = new Date(date);
     return d.toLocaleDateString(undefined, { day: "numeric", month: "long" });
 };
+
+const onFromDateChanged = () => {
+    const dateFrom = new Date(formDateFrom.value);
+    const dateTo = new Date(formDateTo.value);
+    if (dateFrom >= dateTo) {
+        let dateToNew = dateTo;
+        dateToNew.setDate(dateFrom.getDate() + 1);
+        formDateTo.value = dateToNew;
+    }
+}
+
+
 </script>
 
 <template>
@@ -258,7 +273,7 @@ const formatDate = (date: string) => {
                                 <form @submit.prevent="onAddPriceItem">
                                     <FloatLabel class="mt-small">
                                         <DatePicker id="fromDate" v-model="formDateFrom"
-                                            :max-date="new Date(formDateTo)" date-format="dd MM" showIcon
+                                            v-on:value-change="onFromDateChanged" date-format="dd MM" showIcon
                                             class="w-full" />
                                         <label for="fromDate">From</label>
                                     </FloatLabel>
