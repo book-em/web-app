@@ -18,6 +18,7 @@ const formDateTo = ref<Date>(new Date());
 const formAvailable = ref(true);
 const errorAvailabilityNew = ref("");
 const errorAvailability = ref("");
+const loading = ref(false);
 
 onMounted(
     () => loadRoomAvailability()
@@ -29,6 +30,8 @@ watch(
 );
 
 const loadRoomAvailability = () => {
+    loading.value = true;
+
     RoomAPI.findCurrentAvailabilityListOfRoom(props.roomId)
         .then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
             roomAvailability.value = res.data;
@@ -37,6 +40,7 @@ const loadRoomAvailability = () => {
             console.error(err);
         })
         .finally(() => {
+            loading.value = false;
             ensureAvailabilityExists();
         });
 };
@@ -102,7 +106,10 @@ const submitEditingRoomAvailability = () => {
             available: item.available,
         }));
     const dto: CreateRoomAvailabilityListDTO = { roomId: props.roomId, items };
+
     errorAvailability.value = "";
+    loading.value = true;
+
     RoomAPI.updateAvailability(dto)
         .then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
             roomAvailability.value = res.data;
@@ -111,6 +118,8 @@ const submitEditingRoomAvailability = () => {
         .catch((err: AxiosError) => {
             errorAvailability.value = err.message.toString();
             console.error(err);
+        }).finally(() => {
+            loading.value = false;
         });
 };
 
@@ -122,6 +131,9 @@ const formatDate = (date: string) => {
 </script>
 
 <template>
+    <div v-if="loading">
+        <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+    </div>
     <div class="p-4" v-if="roomAvailability != null">
         <Card>
             <template #content>

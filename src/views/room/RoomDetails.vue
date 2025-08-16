@@ -12,28 +12,21 @@ const route = useRoute();
 const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
 const auth = useAuthStore();
+const loading = ref(false);
 
 onMounted(() => loadRoom());
 
 const loadRoom = () => {
     const roomId: number = parseInt(route.params.id as string);
 
+    loading.value = true;
+
     RoomAPI.findById(roomId).then((res: AxiosResponse<RoomDTO>) => {
         room.value = res.data;
-        loadRoomAvailability();
     }).catch((err: AxiosError) => {
         console.error(err);
-    });
-}
-
-const loadRoomAvailability = () => {
-    const roomId: number = parseInt(route.params.id as string);
-
-    RoomAPI.findCurrentAvailabilityListOfRoom(roomId).then((res: AxiosResponse<RoomAvailabilityListDTO>) => {
-        console.log(res.data);
-        roomAvailability.value = res.data;
-    }).catch((err: AxiosError) => {
-        console.error(err);
+    }).finally(() => {
+        loading.value = false;
     });
 }
 
@@ -51,6 +44,9 @@ const galleryResponsiveOptions = ref([
 </script>
 
 <template>
+    <div v-if="loading">
+        <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
+    </div>
     <div v-if="room">
         <h2>{{ room.name }}</h2>
         <p>{{ room.description }}</p>
