@@ -69,6 +69,36 @@ export interface RoomAvailabilityItemDTO {
     available: boolean
 }
 
+export interface CreateRoomPriceItemDTO {
+    existingId: number;
+    dateFrom: string; // ISO date string
+    dateTo: string;   // ISO date string
+    price: number;
+}
+
+export interface RoomPriceItemDTO {
+    id: number;
+    dateFrom: string;
+    dateTo: string;
+    price: number;
+}
+
+export interface CreateRoomPriceListDTO {
+    roomId: number;
+    items: CreateRoomPriceItemDTO[];
+    basePrice: number;
+    perGuest: boolean;
+}
+
+export interface RoomPriceListDTO {
+    id: number;
+    roomId: number;
+    effectiveFrom: string; // ISO date string
+    basePrice: number;
+    items: RoomPriceItemDTO[];
+    perGuest: boolean;
+}
+
 export class RoomAPI {
     static create(dto: RoomCreateDTO): Promise<AxiosResponse<RoomDTO>> {
         return axiosInstanceRooms.post(`/new`, dto);
@@ -96,5 +126,21 @@ export class RoomAPI {
 
     static updateAvailability(dto: CreateRoomAvailabilityListDTO): Promise<AxiosResponse<RoomAvailabilityListDTO>> {
         return axiosInstanceRooms.post(`/available`, dto);
+    }
+
+    static findCurrentPriceListOfRoom(roomId: number): Promise<AxiosResponse<RoomPriceListDTO>> {
+        return axiosInstanceRooms.get(`/price/room/${roomId}`);
+    }
+
+    static findPriceListsByRoomId(roomId: number): Promise<AxiosResponse<RoomPriceListDTO[]>> {
+        return axiosInstanceRooms.get(`/price/room/all/${roomId}`);
+    }
+
+    static findPriceListById(id: number): Promise<AxiosResponse<RoomPriceListDTO>> {
+        return axiosInstanceRooms.get(`/price/${id}`);
+    }
+
+    static updatePriceList(dto: CreateRoomPriceListDTO): Promise<AxiosResponse<RoomPriceListDTO>> {
+        return axiosInstanceRooms.post(`/price`, dto);
     }
 }

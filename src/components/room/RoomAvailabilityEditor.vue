@@ -122,7 +122,7 @@ const formatDate = (date: string) => {
 </script>
 
 <template>
-    <div class="p-4">
+    <div class="p-4" v-if="roomAvailability != null">
         <Card>
             <template #content>
                 <div>
