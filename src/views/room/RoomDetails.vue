@@ -53,10 +53,10 @@ const galleryResponsiveOptions = ref([
 
         <Tabs value="0">
             <TabList>
-                <Tab value="0">Details</Tab>
+                <Tab value="0"><i class="pi pi-info-circle"> Details</i></Tab>
                 <template v-if="auth.role == UserRole.Host">
-                    <Tab value="1">Availability</Tab>
-                    <Tab value="2">Price</Tab>
+                    <Tab value="1"><i class="pi pi-calendar"> Availability</i></Tab>
+                    <Tab value="2"><i class="pi pi-dollar"> Price</i></Tab>
                 </template>
             </TabList>
 
