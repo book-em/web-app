@@ -25,6 +25,12 @@ import Row from 'primevue/row';
 import Tooltip from 'primevue/tooltip';
 import BlockUI from 'primevue/blockui';
 import Galleria from 'primevue/galleria';
+import Tabs from 'primevue/tabs';
+import TabList from 'primevue/tablist';
+import Tab from 'primevue/tab';
+import TabPanels from 'primevue/tabpanels';
+import TabPanel from 'primevue/tabpanel';
+
 
 const app = createApp(App);
 
@@ -66,5 +72,10 @@ app.component('Row', Row);
 app.component('BlockUI', BlockUI);
 app.component('Tag', Tag);
 app.component('Galleria', Galleria);
+app.component('Tabs', Tabs);
+app.component('TabList', TabList);
+app.component('Tab', Tab);
+app.component('TabPanels', TabPanels);
+app.component('TabPanel', TabPanel);
 
 app.mount('#app');
