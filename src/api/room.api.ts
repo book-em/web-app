@@ -41,6 +41,11 @@ export interface RoomAvailabilityListDTO {
 
 export interface CreateRoomAvailabilityItemDTO {
     /**
+     * ID of the existing room availability item.
+     * If 0, then this is a brand new one
+     */
+    existingId: number,
+    /**
      * Date object
      */
     dateFrom: string,
