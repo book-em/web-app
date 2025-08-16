@@ -247,14 +247,15 @@ const formatDate = (date: string) => {
 
                                 <form @submit.prevent="onAddPriceItem">
                                     <FloatLabel class="mt-small">
-                                        <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
+                                        <DatePicker id="fromDate" v-model="formDateFrom"
+                                            :max-date="new Date(formDateTo)" date-format="dd MM" showIcon
                                             class="w-full" />
                                         <label for="fromDate">From</label>
                                     </FloatLabel>
 
                                     <FloatLabel class="mt-small">
-                                        <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
-                                            class="w-full" />
+                                        <DatePicker id="toDate" v-model="formDateTo" :min-date="new Date(formDateFrom)"
+                                            date-format="dd MM" showIcon class="w-full" />
                                         <label for="toDate">To</label>
                                     </FloatLabel>
 
