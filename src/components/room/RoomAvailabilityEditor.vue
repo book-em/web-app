@@ -21,7 +21,10 @@ const errorAvailability = ref("");
 const loading = ref(false);
 
 onMounted(
-    () => loadRoomAvailability()
+    () => {
+        loadRoomAvailability();
+        formDateTo.value.setDate(formDateFrom.value.getDate() + 7);
+    }
 );
 
 watch(
@@ -128,6 +131,16 @@ const formatDate = (date: string) => {
     return d.toLocaleDateString(undefined, { day: "numeric", month: "long" });
 };
 
+const onFromDateChanged = () => {
+    const dateFrom = new Date(formDateFrom.value);
+    const dateTo = new Date(formDateTo.value);
+    if (dateFrom >= dateTo) {
+        let dateToNew = dateTo;
+        dateToNew.setDate(dateFrom.getDate() + 1);
+        formDateTo.value = dateToNew;
+    }
+}
+
 </script>
 
 <template>
@@ -205,7 +218,7 @@ const formatDate = (date: string) => {
                                     <FloatLabel class="mt-small">
                                         <label for="fromDate">From</label>
                                         <DatePicker id="fromDate" v-model="formDateFrom"
-                                            :max-date="new Date(formDateTo)" date-format="dd MM" showIcon
+                                            v-on:value-change="onFromDateChanged" date-format="dd MM" showIcon
                                             class="w-full" />
                                     </FloatLabel>
 
