@@ -114,70 +114,97 @@ const formatDate = (date: string) => {
 
 </script>
 
-
 <template>
     <div class="p-4">
-        <Card> <template #title>
-                <h2 class="text-xl font-semibold">Room Availability</h2>
-            </template>
+        <Card>
             <template #content>
-                <div v-if="roomAvailability == null" class="text-gray-500"> <i class="pi pi-info-circle mr-2"></i> No
-                    availability data found. </div>
-                <div v-else> <!-- List -->
-                    <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
-                        <Column header="From" field="dateFrom"> <template #body="slotProps"> {{
-                            formatDate(slotProps.data.dateFrom) }} </template>
-                        </Column>
-                        <Column header="To" field="dateTo"> <template #body="slotProps"> {{
-                            formatDate(slotProps.data.dateTo) }} </template>
-                        </Column>
-                        <Column header="Can Book?"> <template #body="slotProps">
-                                <Tag :value="slotProps.data.available ? 'Yes' : 'No'"
-                                    :severity="slotProps.data.available ? 'success' : 'danger'" icon="pi pi-check"
-                                    v-if="slotProps.data.available" />
-                                <Tag value="No" severity="danger" icon="pi pi-ban" v-else />
-                            </template>
-                        </Column>
-                        <Column header="Actions"> <template #body="slotProps"> <Button icon="pi pi-trash" label="Remove"
-                                    class="p-button-danger p-button-sm" @click="removeAvailItem(slotProps.index)"
-                                    :disabled="!isEditingRoomAvailability" /> </template>
-                        </Column>
-                    </DataTable> <!-- Heatmap calendar -->
-                    <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="new Date().getFullYear()" />
+                <div v-if="roomAvailability == null" class="text-gray-500">
+                    <i class="pi pi-info-circle mr-2"></i> No availability data found.
                 </div>
-                <Divider />
-                <div class="mt-small"> <!-- Edit mode -->
-                    <div v-if="!isEditingRoomAvailability"> <!-- When not editing --> <Button icon="pi pi-pencil"
-                            label="Edit" class="p-button-info" @click="startEditingRoomAvailability" /> </div>
-                    <div v-else> <!-- When editing -->
-                        <h3>Add new availability rule</h3>
-                        <form @submit.prevent="onAddAvailItem" class="flex flex-wrap gap-4 items-end">
-                            <FloatLabel class="mt-small"> <label for="fromDate">From</label>
-                                <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
-                                    class="w-full" />
-                            </FloatLabel>
-                            <FloatLabel class="mt-small"> <label for="toDate">To</label>
-                                <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
-                                    class="w-full" />
-                            </FloatLabel>
-                            <div class="flex items-center gap-2 mt-small"> <label for="available"
-                                    class="mr-small">Reservations allowed
-                                    during these days:</label>
-                                <Checkbox id="available" v-model="formAvailable" binary />
+
+                <div v-else>
+                    <div>
+                        <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="new Date().getFullYear()" />
+                    </div>
+
+                    <div class="availability-layout">
+                        <!-- LEFT SIDE: List -->
+                        <div class="left-panel">
+                            <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
+                                <Column header="From" field="dateFrom"> <template #body="slotProps"> {{
+                                    formatDate(slotProps.data.dateFrom) }} </template>
+                                </Column>
+                                <Column header="To" field="dateTo"> <template #body="slotProps"> {{
+                                    formatDate(slotProps.data.dateTo) }} </template>
+                                </Column>
+                                <Column header="Can Book?"> <template #body="slotProps">
+                                        <Tag :value="slotProps.data.available ? 'Yes' : 'No'"
+                                            :severity="slotProps.data.available ? 'success' : 'danger'"
+                                            icon="pi pi-check" v-if="slotProps.data.available" />
+                                        <Tag value="No" severity="danger" icon="pi pi-ban" v-else />
+                                    </template>
+                                </Column>
+                                <Column header="Actions"> <template #body="slotProps"> <Button icon="pi pi-trash"
+                                            label="Remove" class="p-button-danger p-button-sm"
+                                            @click="removeAvailItem(slotProps.index)"
+                                            :disabled="!isEditingRoomAvailability" /> </template>
+                                </Column>
+                            </DataTable>
+
+                        </div>
+
+                        <!-- RIGHT SIDE: Form -->
+                        <div class="right-panel mt-small">
+                            <div v-if="!isEditingRoomAvailability">
+                                <Button icon="pi pi-pencil" label="Edit" class="p-button-info"
+                                    @click="startEditingRoomAvailability" />
                             </div>
-                            <Message v-show="errorAvailabilityNew.length > 0" severity="error" size="small"
-                                variant="simple"> {{
-                                    errorAvailabilityNew }} </Message> <Button type="submit" icon="pi pi-plus"
-                                label="Add rule" class="mt-small" />
-                        </form>
-                        <Divider />
-                        <div class="mt-big">
-                            <Message v-show="errorAvailability.length > 0" severity="error" size="small"
-                                variant="simple"> {{
-                                    errorAvailability }} </Message> <Button icon="pi pi-undo" label="Cancel editing"
-                                class="p-button-danger mr-small" @click="cancelEditingRoomAvailability" /> <Button
-                                :disabled="errorAvailability.length > 0" icon="pi pi-send" label="Submit changes"
-                                class="p-button-success mr-small" @click="submitEditingRoomAvailability" />
+
+                            <div v-else>
+                                <div>
+                                    <Message v-show="errorAvailability.length > 0" severity="error" size="small"
+                                        variant="simple">
+                                        {{ errorAvailability }}
+                                    </Message>
+
+                                    <Button icon="pi pi-undo" label="Cancel editing" class="p-button-danger mr-small"
+                                        @click="cancelEditingRoomAvailability" />
+                                    <Button :disabled="errorAvailability.length > 0" icon="pi pi-send"
+                                        label="Submit changes" class="p-button-success mr-small"
+                                        @click="submitEditingRoomAvailability" />
+                                </div>
+
+                                <Divider />
+
+                                <h3>Add new availability rule</h3>
+
+                                <form @submit.prevent="onAddAvailItem" class="flex flex-col gap-4">
+                                    <FloatLabel class="mt-small">
+                                        <label for="fromDate">From</label>
+                                        <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
+                                            class="w-full" />
+                                    </FloatLabel>
+
+                                    <FloatLabel class="mt-small">
+                                        <label for="toDate">To</label>
+                                        <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
+                                            class="w-full" />
+                                    </FloatLabel>
+
+                                    <div class="flex items-center gap-2 mt-small">
+                                        <label for="available" class="mr-small">Reservations allowed during these
+                                            days:</label>
+                                        <Checkbox id="available" v-model="formAvailable" binary />
+                                    </div>
+
+                                    <Message v-show="errorAvailabilityNew.length > 0" severity="error" size="small"
+                                        variant="simple">
+                                        {{ errorAvailabilityNew }}
+                                    </Message>
+
+                                    <Button type="submit" icon="pi pi-plus" label="Add rule" class="mt-small" />
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -185,6 +212,8 @@ const formatDate = (date: string) => {
         </Card>
     </div>
 </template>
+
+
 <style lang="css" scoped>
 .preview-grid {
     display: flex;
@@ -249,5 +278,21 @@ const formatDate = (date: string) => {
 
 .mr-small {
     margin-right: 1em;
+}
+
+.availability-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.left-panel {
+    flex: 2;
+    min-width: 400px;
+}
+
+.right-panel {
+    flex: 1;
+    min-width: 200px;
 }
 </style>
