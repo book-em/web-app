@@ -105,9 +105,23 @@ const startEditingRoomAvailability = () => {
 }
 
 const submitEditingRoomAvailability = () => {
+    var items: CreateRoomAvailabilityItemDTO[] = [];
+    for (let index = 0; index < roomAvailability.value.items.length; index++) {
+        const element = roomAvailability.value.items[index];
+
+        const item: CreateRoomAvailabilityItemDTO = {
+            existingId: element.id,
+            dateFrom: element.dateFrom,
+            dateTo: element.dateTo,
+            available: element.available
+        }
+
+        items.push(item);
+    }
+
     const createRoomAvailability: CreateRoomAvailabilityListDTO = {
         roomId: roomAvailability.value.roomId,
-        items: roomAvailability.value.items
+        items
     };
 
     errorAvailability.value = "";
