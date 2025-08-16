@@ -35,10 +35,13 @@ const loadRoomAvailability = () => {
         })
         .catch((err: AxiosError) => {
             console.error(err);
+        })
+        .finally(() => {
+            ensureAvailabilityExists();
         });
 };
 
-const onAddAvailItem = () => {
+const ensureAvailabilityExists = () => {
     if (roomAvailability.value === null) {
         roomAvailability.value = {
             id: 0,
@@ -47,6 +50,10 @@ const onAddAvailItem = () => {
             roomId: props.roomId,
         };
     }
+}
+
+const onAddAvailItem = () => {
+    ensureAvailabilityExists();
     errorAvailabilityNew.value = "";
     const from = formDateFrom.value;
     const to = formDateTo.value;
@@ -118,11 +125,7 @@ const formatDate = (date: string) => {
     <div class="p-4">
         <Card>
             <template #content>
-                <div v-if="roomAvailability == null" class="text-gray-500">
-                    <i class="pi pi-info-circle mr-2"></i> No availability data found.
-                </div>
-
-                <div v-else>
+                <div>
                     <div>
                         <HeatmapCalendar :availabilityItems="roomAvailability.items" :year="new Date().getFullYear()" />
                     </div>
@@ -130,29 +133,33 @@ const formatDate = (date: string) => {
                     <div class="availability-layout">
                         <!-- LEFT SIDE: List -->
                         <div class="left-panel">
-                            <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
-                                <Column header="From" field="dateFrom"> <template #body="slotProps"> {{
-                                    formatDate(slotProps.data.dateFrom) }} </template>
-                                </Column>
-                                <Column header="To" field="dateTo"> <template #body="slotProps"> {{
-                                    formatDate(slotProps.data.dateTo) }} </template>
-                                </Column>
-                                <Column header="Can Book?"> <template #body="slotProps">
-                                        <Tag :value="slotProps.data.available ? 'Yes' : 'No'"
-                                            :severity="slotProps.data.available ? 'success' : 'danger'"
-                                            icon="pi pi-check" v-if="slotProps.data.available" />
-                                        <Tag value="No" severity="danger" icon="pi pi-ban" v-else />
-                                    </template>
-                                </Column>
-                                <Column header="Actions"> <template #body="slotProps"> <Button icon="pi pi-trash"
-                                            label="Remove" class="p-button-danger p-button-sm"
-                                            @click="removeAvailItem(slotProps.index)"
-                                            :disabled="!isEditingRoomAvailability" /> </template>
-                                </Column>
-                            </DataTable>
+                            <div v-if="roomAvailability.items.length > 0">
+                                <DataTable :value="roomAvailability.items" responsiveLayout="scroll" class="mb-4">
+                                    <Column header="From" field="dateFrom"> <template #body="slotProps"> {{
+                                        formatDate(slotProps.data.dateFrom) }} </template>
+                                    </Column>
+                                    <Column header="To" field="dateTo"> <template #body="slotProps"> {{
+                                        formatDate(slotProps.data.dateTo) }} </template>
+                                    </Column>
+                                    <Column header="Can Book?"> <template #body="slotProps">
+                                            <Tag :value="slotProps.data.available ? 'Yes' : 'No'"
+                                                :severity="slotProps.data.available ? 'success' : 'danger'"
+                                                icon="pi pi-check" v-if="slotProps.data.available" />
+                                            <Tag value="No" severity="danger" icon="pi pi-ban" v-else />
+                                        </template>
+                                    </Column>
+                                    <Column header="Actions"> <template #body="slotProps"> <Button icon="pi pi-trash"
+                                                label="Remove" class="p-button-danger p-button-sm"
+                                                @click="removeAvailItem(slotProps.index)"
+                                                :disabled="!isEditingRoomAvailability" /> </template>
+                                    </Column>
+                                </DataTable>
+                            </div>
+                            <div v-else>
+                                <i class="pi pi-info-circle mr-2"></i> No room availability rooms have been defined.
+                            </div>
 
                         </div>
-
                         <!-- RIGHT SIDE: Form -->
                         <div class="right-panel mt-small">
                             <div v-if="!isEditingRoomAvailability">
