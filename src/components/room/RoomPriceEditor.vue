@@ -70,14 +70,28 @@ const onAddPriceItem = () => {
     const from = formDateFrom.value;
     const to = formDateTo.value;
 
-    const datesEqualWithoutYear = (d1: Date, d2: Date): boolean =>
-        d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+    const normalizeDate = (date: Date): Date =>
+        new Date(2000, date.getMonth(), date.getDate());
+
+    const rangesIntersectIgnoringYear = (
+        from: Date,
+        to: Date,
+        from2: Date,
+        to2: Date
+    ): boolean => {
+        const start1 = normalizeDate(from);
+        const end1 = normalizeDate(to);
+        const start2 = normalizeDate(from2);
+        const end2 = normalizeDate(to2);
+
+        return start1 <= end2 && start2 <= end1;
+    };
 
     for (const element of roomPriceList.value.items) {
         const from2 = new Date(element.dateFrom);
         const to2 = new Date(element.dateTo);
-        if (datesEqualWithoutYear(from, from2) && datesEqualWithoutYear(to, to2)) {
-            errorPriceNew.value = "A price rule with this date range already exists";
+        if (rangesIntersectIgnoringYear(from, to, from2, to2)) {
+            errorPriceNew.value = `Conflicting date with (${from2.toDateString()} - ${to2.toDateString()})`;
             return;
         }
     }
@@ -155,8 +169,11 @@ const formatDate = (date: string) => {
                             <div>
                                 <h3>Base price: ${{ roomPriceList.basePrice }} {{ (roomPriceList.perGuest ? "per guest "
                                     : "") + "per night" }}</h3>
+
+
                                 <DataTable v-if="roomPriceList.items.length > 0" :value="roomPriceList?.items ?? []"
                                     responsiveLayout="scroll" class="mb-4">
+                                    <h4>Overrides, discounts and special prices:</h4>
                                     <Column header="From" field="dateFrom">
                                         <template #body="slotProps">
                                             {{ formatDate(slotProps.data.dateFrom) }}
