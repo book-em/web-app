@@ -1,23 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useAuthStore } from '../../stores/auth-store';
-import { useRoute, useRouter } from 'vue-router';
-import { type CreateRoomAvailabilityItemDTO, type CreateRoomAvailabilityListDTO, RoomAPI, type RoomAvailabilityItemDTO, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
+import { useRoute } from 'vue-router';
+import { RoomAPI, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import RoomAvailabilityEditor from '../../components/room/RoomAvailabilityEditor.vue';
+import RoomPriceEditor from '../../components/room/RoomPriceEditor.vue';
 
 const route = useRoute();
 const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
-const roomAvailabilityBeforeEdit = ref<RoomAvailabilityListDTO | null>(null);
-const isEditingRoomAvailability = ref(false);
-
-const formDateFrom = ref<Date>(new Date());
-const formDateTo = ref<Date>(new Date());
-const formAvailable = ref(true);
-
-const errorAvailabilityNew = ref('');
-const errorAvailability = ref('');
 
 onMounted(() => loadRoom());
 
@@ -43,12 +34,6 @@ const loadRoomAvailability = () => {
     });
 }
 
-
-
-
-
-
-
 const galleryResponsiveOptions = ref([
     {
         breakpoint: '1300px',
@@ -71,6 +56,7 @@ const galleryResponsiveOptions = ref([
             <TabList>
                 <Tab value="0">Details</Tab>
                 <Tab value="1">Availability</Tab>
+                <Tab value="2">Price</Tab>
             </TabList>
 
             <TabPanels>
@@ -96,6 +82,10 @@ const galleryResponsiveOptions = ref([
 
                 <TabPanel value="1">
                     <RoomAvailabilityEditor :roomId="room.id" />
+                </TabPanel>
+
+                <TabPanel value="2">
+                    <RoomPriceEditor :roomId="room.id" />
                 </TabPanel>
             </TabPanels>
         </Tabs>
