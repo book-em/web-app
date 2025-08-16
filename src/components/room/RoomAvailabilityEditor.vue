@@ -192,14 +192,15 @@ const formatDate = (date: string) => {
                                 <form @submit.prevent="onAddAvailItem" class="flex flex-col gap-4">
                                     <FloatLabel class="mt-small">
                                         <label for="fromDate">From</label>
-                                        <DatePicker id="fromDate" v-model="formDateFrom" date-format="dd MM" showIcon
+                                        <DatePicker id="fromDate" v-model="formDateFrom"
+                                            :max-date="new Date(formDateTo)" date-format="dd MM" showIcon
                                             class="w-full" />
                                     </FloatLabel>
 
                                     <FloatLabel class="mt-small">
                                         <label for="toDate">To</label>
-                                        <DatePicker id="toDate" v-model="formDateTo" date-format="dd MM" showIcon
-                                            class="w-full" />
+                                        <DatePicker id="toDate" v-model="formDateTo" :min-date="new Date(formDateFrom)"
+                                            date-format="dd MM" showIcon class="w-full" />
                                     </FloatLabel>
 
                                     <div class="flex items-center gap-2 mt-small">
