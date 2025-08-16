@@ -5,10 +5,13 @@ import { RoomAPI, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/r
 import type { AxiosError, AxiosResponse } from 'axios';
 import RoomAvailabilityEditor from '../../components/room/RoomAvailabilityEditor.vue';
 import RoomPriceEditor from '../../components/room/RoomPriceEditor.vue';
+import { useAuthStore } from '../../stores/auth-store';
+import { UserRole } from '../../api/user.api';
 
 const route = useRoute();
 const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
+const auth = useAuthStore();
 
 onMounted(() => loadRoom());
 
@@ -55,8 +58,10 @@ const galleryResponsiveOptions = ref([
         <Tabs value="0">
             <TabList>
                 <Tab value="0">Details</Tab>
-                <Tab value="1">Availability</Tab>
-                <Tab value="2">Price</Tab>
+                <template v-if="auth.role == UserRole.Host">
+                    <Tab value="1">Availability</Tab>
+                    <Tab value="2">Price</Tab>
+                </template>
             </TabList>
 
             <TabPanels>
