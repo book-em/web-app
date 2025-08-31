@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { RoomAPI, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import RoomAvailabilityEditor from '../../components/room/RoomAvailabilityEditor.vue';
@@ -9,11 +9,13 @@ import { useAuthStore } from '../../stores/auth-store';
 import { UserRole } from '../../api/user.api';
 
 const route = useRoute();
+const router = useRouter();
 const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
 const auth = useAuthStore();
 const loading = ref(false);
 
+onMounted(() => { auth.checkLocalStorage(); });
 onMounted(() => loadRoom());
 
 const loadRoom = () => {
@@ -41,6 +43,12 @@ const galleryResponsiveOptions = ref([
     }
 ]);
 
+const gotoReservation = () => {
+    const roomId: number = parseInt(route.params.id as string);
+
+    router.push(`/reservation/new/${roomId}`);
+}
+
 </script>
 
 <template>
@@ -61,6 +69,9 @@ const galleryResponsiveOptions = ref([
             </TabList>
 
             <TabPanels>
+                <template v-if="auth.role == UserRole.Guest">
+                    <Button v-on:click="gotoReservation">Book a reservation</Button>
+                </template>
                 <TabPanel value="0">
                     <p>{{ room.address }}</p>
                     <p>{{ room.minGuests }} - {{ room.maxGuests }} guests</p>
@@ -72,7 +83,7 @@ const galleryResponsiveOptions = ref([
                         containerStyle="max-width: 80%; margin: auto;" class="preview-item">
                         <template #item="slotProps">
                             <Image :src="`http://localhost:8505/img/${slotProps.item}`" preview
-                                style="width: 500px; height: 500px; object-fit: cover;" />
+                                style="width: 300px; height: 300px; object-fit: cover;" />
                         </template>
                         <template #thumbnail="slotProps">
                             <img :src="`http://localhost:8505/img/${slotProps.item}`"
