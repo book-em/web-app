@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth-store';
 import { ReservationAPI, ReservationRequestStatus, type CreateReservationRequestDTO, type ReservationRequestDTO } from '../../api/reservation.api';
 import type { AxiosError, AxiosResponse } from 'axios';
-import { type RoomAvailabilityListDTO, type RoomReservationQueryDTO, RoomAPI, RoomReservationQueryResponseDTO } from '../../api/room.api';
+import { type RoomAvailabilityListDTO, type RoomReservationQueryDTO, RoomAPI, type RoomReservationQueryResponseDTO } from '../../api/room.api';
 import HeatmapCalendar from '../../components/HeatmapCalendar.vue';
 
 const route = useRoute();
