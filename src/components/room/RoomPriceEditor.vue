@@ -168,6 +168,7 @@ const onFromDateChanged = () => {
     if (dateFrom >= dateTo) {
         let dateToNew = dateTo;
         dateToNew.setDate(dateFrom.getDate() + 1);
+        dateToNew.setHours(0, 0, 0, 0);
         formDateTo.value = dateToNew;
     }
 }
