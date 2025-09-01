@@ -99,6 +99,19 @@ export interface RoomPriceListDTO {
     perGuest: boolean;
 }
 
+export interface RoomReservationQueryDTO {
+    roomId: number;
+    dateFrom: string; // ISO date string
+    dateTo: string;
+    guestCount: number;
+}
+
+export interface RoomReservationQueryResponseDTO {
+    available: boolean;
+    totalCost: number;
+}
+
+
 export class RoomAPI {
     static create(dto: RoomCreateDTO): Promise<AxiosResponse<RoomDTO>> {
         return axiosInstanceRooms.post(`/new`, dto);
@@ -142,5 +155,9 @@ export class RoomAPI {
 
     static updatePriceList(dto: CreateRoomPriceListDTO): Promise<AxiosResponse<RoomPriceListDTO>> {
         return axiosInstanceRooms.post(`/price`, dto);
+    }
+
+    static queryForReservation(dto: RoomReservationQueryDTO): Promise<AxiosResponse<RoomReservationQueryResponseDTO>> {
+        return axiosInstanceRooms.post(`/reservation/query`, dto);
     }
 }
