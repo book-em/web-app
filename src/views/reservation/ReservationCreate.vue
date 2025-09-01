@@ -25,6 +25,7 @@ onMounted(() => {
     auth.checkLocalStorage();
     roomId.value = parseInt(route.params.id as string);
     loadRoomAvailability();
+    onFromDateChanged();
     queryReservationInfo();
 });
 onMounted(() => { formDateTo.value.setDate(formDateFrom.value.getDate() + 7); });
@@ -114,6 +115,11 @@ const onFromDateChanged = () => {
     queryReservationInfo();
 }
 
+const onGuestCountChange = (newValue: number) => {
+    formGuestCount.value = newValue;
+    queryReservationInfo();
+}
+
 </script>
 
 <template>
@@ -143,7 +149,7 @@ const onFromDateChanged = () => {
 
             <FloatLabel class="mt-small">
                 <InputNumber id="guestCount" v-model="formGuestCount" class="w-full" :min="1" :max="999" fluid
-                    v-on:value-change="queryReservationInfo" />
+                    @input="(e) => { onGuestCountChange(e.value as number); }" />
                 <label for="basePrice">Number of guests</label>
             </FloatLabel>
             <br />
