@@ -124,7 +124,7 @@ const onGuestCountChange = (newValue: number) => {
 </script>
 
 <template>
-    <h3>Create new reservation for room <RouterLink :to="`/room/${roomId}`">room {{ roomId }}</RouterLink>
+    <h3>Create new reservation for <RouterLink :to="`/room/${roomId}`">room {{ roomId }}</RouterLink>
     </h3>
 
     <div v-if="loading">
