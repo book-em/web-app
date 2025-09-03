@@ -6,6 +6,7 @@ import { ReservationAPI, ReservationRequestStatus, type CreateReservationRequest
 import type { AxiosError, AxiosResponse } from 'axios';
 import { type RoomAvailabilityListDTO, type RoomReservationQueryDTO, RoomAPI, type RoomReservationQueryResponseDTO } from '../../api/room.api';
 import HeatmapCalendar from '../../components/HeatmapCalendar.vue';
+import { RefSymbol } from '@vue/reactivity';
 
 const route = useRoute();
 const router = useRouter();
@@ -25,7 +26,10 @@ onMounted(() => {
     auth.checkLocalStorage();
     roomId.value = parseInt(route.params.id as string);
     loadRoomAvailability();
+
+    formDateTo.value.setDate(formDateFrom.value.getDate() + 1);
     onFromDateChanged();
+
     queryReservationInfo();
 });
 onMounted(() => { formDateTo.value.setDate(formDateFrom.value.getDate() + 7); });
@@ -104,16 +108,24 @@ const onSubmitReservationRequest = () => {
 }
 
 const onFromDateChanged = () => {
-    const dateFrom = new Date(formDateFrom.value);
-    const dateTo = new Date(formDateTo.value);
+    let dateFrom = strippedDate(new Date(formDateFrom.value));
+    let dateTo = strippedDate(new Date(formDateTo.value));
+
     if (dateFrom >= dateTo) {
-        let dateToNew = dateTo;
-        dateToNew.setDate(dateFrom.getDate() + 1);
-        dateToNew.setHours(0, 0, 0, 0);
-        formDateTo.value = dateToNew;
+        dateTo.setDate(dateFrom.getDate() + 1);
+        dateTo = strippedDate(dateTo);
     }
 
+    formDateFrom.value = dateFrom;
+    formDateTo.value = dateTo;
+
     queryReservationInfo();
+}
+
+const strippedDate = (date: Date): Date => {
+    let dateNew = new Date(date);
+    dateNew.setHours(0, 0, 0, 0);
+    return dateNew;
 }
 
 const onGuestCountChange = (newValue: number) => {
