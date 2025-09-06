@@ -111,6 +111,37 @@ export interface RoomReservationQueryResponseDTO {
     totalCost: number;
 }
 
+export interface QueryRoomsDTO {
+    address: string;
+    guestsNumber: number;
+    dateFrom: string;
+    dateTo: string;
+    pageNumber: number;
+    pageSize: number;
+}
+
+export interface PaginatedResultInfoDTO {
+	page: number,
+    pageSize: number,
+    totalPages: number,
+    totalHits: number,
+}
+
+export interface RoomResultDTO {
+    id: number,
+    name: string,
+    description: string,
+    address: string,
+    photos: string[],
+    perGuest: string[],
+    unitPrice: number,
+    totalPrice: number,
+}
+
+export interface RoomsResultDTO {
+    hits: RoomResultDTO[],
+    info: PaginatedResultInfoDTO,
+}
 
 export class RoomAPI {
     static create(dto: RoomCreateDTO): Promise<AxiosResponse<RoomDTO>> {
@@ -123,6 +154,10 @@ export class RoomAPI {
 
     static findByHostId(hostId: number): Promise<AxiosResponse<RoomDTO[]>> {
         return axiosInstanceRooms.get(`/host/${hostId}`);
+    }
+    
+    static findAvailableRooms(dto: QueryRoomsDTO): Promise<AxiosResponse<RoomsResultDTO>> {
+        return axiosInstanceRooms.get(`/all`, {params: {...dto}});
     }
 
     static findCurrentAvailabilityListOfRoom(roomId: number): Promise<AxiosResponse<RoomAvailabilityListDTO>> {
