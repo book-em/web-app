@@ -31,6 +31,7 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import ProgressBar from 'primevue/progressbar';
+import { Paginator } from 'primevue';
 
 const app = createApp(App);
 
@@ -78,5 +79,6 @@ app.component('Tab', Tab);
 app.component('TabPanels', TabPanels);
 app.component('TabPanel', TabPanel);
 app.component('ProgressBar', ProgressBar);
+app.component('Paginator', Paginator);
 
 app.mount('#app');
