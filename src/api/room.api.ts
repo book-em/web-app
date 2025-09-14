@@ -133,7 +133,7 @@ export interface RoomResultDTO {
     description: string,
     address: string,
     photos: string[],
-    perGuest: string[],
+    perGuest: boolean,
     unitPrice: number,
     totalPrice: number,
 }
