@@ -3,10 +3,11 @@ import { onMounted, ref } from 'vue';
 import { RoomAPI, type PaginatedResultInfoDTO, type QueryRoomsDTO, type RoomResultDTO, type RoomsResultDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { PageState } from 'primevue';
+import { label } from '@primeuix/themes/aura/metergroup';
 
 const rooms = ref<RoomResultDTO[]>([]);
 const info = ref<PaginatedResultInfoDTO | null>(null);
-const paginatorPageSize = ref<number>(1);
+const paginatorPageSize = ref<number>(2);
 const paginatorPageNumber = ref<number>(1);
 const formDateFrom = ref<Date>(new Date());
 const formDateTo = ref<Date>(new Date());
@@ -58,148 +59,101 @@ onMounted(() => findAvailableRooms());
 
 <template>
     <div class="find-layout">
-        
-        <div class="left-panel">
-            <form @submit.prevent="findAvailableRooms" class="flex flex-col gap-4">
-                <FloatLabel class="mt-small">
-                    <label for="fromDate">From</label>
-                    <DatePicker id="fromDate" v-model="formDateFrom"
-                        v-on:value-change="onFromDateChanged" date-format="dd MM" showIcon
-                        class="w-full" />
-                </FloatLabel>
 
-                <FloatLabel class="mt-small">
-                    <label for="toDate">To</label>
-                    <DatePicker id="toDate" v-model="formDateTo" :min-date="new Date(formDateFrom)"
-                        date-format="dd MM" showIcon class="w-full" />
-                </FloatLabel>
-                
-                <div class="flex items-center gap-2 mt-small">
-                    <InputNumber :min="1" v-model.trim="formGuests" fluid placeholder="Add number of guests..."/>
-                </div>
+        <form @submit.prevent="findAvailableRooms" class="left-panel">
+            <FloatLabel>
+                <label for="fromDate">From</label>
+                <DatePicker id="fromDate" v-model="formDateFrom"
+                    v-on:value-change="onFromDateChanged" date-format="dd MM" showIcon :style="{ width: '100%' }"/>
+            </FloatLabel>
 
-                <div class="flex items-center gap-2 mt-small">
-                    <InputText type="text" v-model.trim="formAddress" :maxlength="50" fluid  placeholder="Add address..."/>
-                </div>
+            <FloatLabel>
+                <label for="toDate">To</label>
+                <DatePicker id="toDate" v-model="formDateTo" :min-date="new Date(formDateFrom)"
+                    date-format="dd MM" showIcon :style="{ width: '100%' }"/>
+            </FloatLabel>
 
-                <Button type="submit" icon="pi pi-search" label="Search" class="mt-small" />
-            </form>
-        </div>
+            <FloatLabel>
+                <label>Guests</label>
+                <InputNumber :min="1" v-model.trim="formGuests" fluid placeholder="Add number of guests..."/>
+            </FloatLabel>
+            
+            <FloatLabel>
+                <label>Address</label>
+                <InputText type="text" v-model.trim="formAddress" :maxlength="50" fluid  placeholder="Add address..."/>
+            </FloatLabel>
 
-        <div class="right-panel mt-small">
-            <div class="container">
-                <div class="list">
-                    <div v-if="rooms && rooms.length > 0">
-                        <div v-for="room in rooms" :key="room.id" class="room-item">
-                            <div class="flex-items">
-                                <RouterLink :to="`/room/${room.id}`">{{ room.name }}</RouterLink>
-                            </div>
+            <Button type="submit" icon="pi pi-search" label="Search"/>
+        </form>
 
-                            <div class="flex-items">
-                                <div class="preview-grid">
-                                    <div v-for="img in room.photos.slice(0, 4)" class="preview-item">
-                                        <Image :src="`http://localhost:8505/img/${img}`"></Image>
-                                    </div>
+        <div class="right-panel">
+            <div>
+                <div v-if="rooms && rooms.length > 0">
+                    <div v-for="room in rooms" :key="room.id" class="cards">
+                        <Card style="width: 15rem; overflow: hidden">
+                            <template #header>
+                                <Galleria :value="room.photos" :numVisible="5" :circular="true" :showItemNavigators="true" :showThumbnails="false">
+                                    <template #item="photo">
+                                        <img :src="`http://localhost:8505/img/${photo.item}`" :alt="photo.item" style="width: 100%; height: 10rem; object-fit: cover; display: block;" />
+                                    </template>
+                                </Galleria>
+                            </template>
+                            <template #title>{{ room.name }}</template>
+                            <template #subtitle>{{ room.address }}</template>
+                            <template #content>
+                                <p class="m-0">
+                                    {{ room.description }}
+                                </p>
+                            </template>
+                            <template #footer>
+                                €{{ room.totalPrice }} for {{  }} nights, price by guest {{ room.perGuest }}, Day €{{ room.unitPrice }}, 
+                                <div class="flex gap-4 mt-1" >
                                 </div>
-                            </div>                        
-                        </div>
+                            </template>
+                        </Card>
                     </div>
-                    <div v-else>
-                        No rooms found.
-                    </div>
+                </div>
+                <div v-else>
+                    No rooms found.
                 </div>
             </div>
 
-            <Paginator :rows="1" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[1, 2, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange"/>
+            <Paginator :rows="2" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[2, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange">
+            </Paginator>
         </div>
     </div>  
 </template>
 
 <style lang="css" scoped>
 
-.find-layout {
+.cards {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
     gap: 2rem;
-    justify-content: center;
+    width: 100%;
 }
 
-.mt-small {
-    margin-top: 2em;
+.find-layout {
+    margin: 4rem;
+    display: flex;
+    gap: 3rem;
 }
 
 .left-panel {
     flex: 1;
-    min-width: 50px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .right-panel {
-    flex: 2;
-    min-width: 100px;
-}
-.preview-grid {
+    flex: 4;
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-top: 10px;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 600px;
 }
 
-.preview-item {
-    position: relative;
-    width: 220px;
-    height: 220px;
-    border-radius: 6px;
-    overflow: hidden;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-}
-
-.preview-item :deep(.p-image img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.container {
-    margin: 2em;
-}
-
-.list {
-    margin-top: 1em;
-}
-
-.flex-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: normal;
-    align-items: normal;
-    align-content: normal;
-
-    background-color: var(--p-color-text);
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
-    margin-top: 1em;
-}
-
-.flex-items:nth-child(1) {
-    display: block;
-    flex-grow: 0;
-    flex-shrink: 2;
-    flex-basis: auto;
-    align-self: auto;
-    order: 0;
-    margin: 20px;
-    min-width: 20%;
-}
-
-.flex-items:nth-child(2) {
-    display: block;
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: auto;
-    align-self: auto;
-    order: 0;
-    margin: 20px;
-
-}
 
 </style>
