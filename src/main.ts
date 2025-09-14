@@ -10,7 +10,7 @@ import Aura from '@primeuix/themes/aura';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import { AutoComplete, Checkbox, Divider, FileUpload, Image, ProgressSpinner, Tag } from 'primevue';
+import { AutoComplete, Checkbox, Divider, FileUpload, Image, ProgressSpinner, Tag, Paginator } from 'primevue';
 import Card from 'primevue/card';
 import Fieldset from 'primevue/fieldset';
 import Select from 'primevue/select';
@@ -31,7 +31,6 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import ProgressBar from 'primevue/progressbar';
-import { Paginator } from 'primevue';
 
 const app = createApp(App);
 
