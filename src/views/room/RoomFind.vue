@@ -7,7 +7,7 @@ import { label } from '@primeuix/themes/aura/metergroup';
 
 const rooms = ref<RoomResultDTO[]>([]);
 const info = ref<PaginatedResultInfoDTO | null>(null);
-const paginatorPageSize = ref<number>(2);
+const paginatorPageSize = ref<number>(4);
 const paginatorPageNumber = ref<number>(1);
 const formDateFrom = ref<Date>(new Date());
 const formDateTo = ref<Date>(new Date());
@@ -88,9 +88,9 @@ onMounted(() => findAvailableRooms());
 
         <div class="right-panel">
             <div>
-                <div v-if="rooms && rooms.length > 0">
-                    <div v-for="room in rooms" :key="room.id" class="cards">
-                        <Card style="width: 15rem; overflow: hidden">
+                <div v-if="rooms && rooms.length > 0" class="cards">
+                    <div v-for="room in rooms" :key="room.id">
+                        <Card style="width: 14rem; overflow: hidden;">
                             <template #header>
                                 <Galleria :value="room.photos" :numVisible="5" :circular="true" :showItemNavigators="true" :showThumbnails="false">
                                     <template #item="photo">
@@ -99,15 +99,27 @@ onMounted(() => findAvailableRooms());
                                 </Galleria>
                             </template>
                             <template #title>{{ room.name }}</template>
-                            <template #subtitle>{{ room.address }}</template>
+                            <template #subtitle>
+                                <div style="font-size: 12pt;">
+                                    <p><i class="pi pi-map-marker" style="font-size: 0.7rem"></i> {{ room.address }}</p>
+                                </div>
+                            </template>
                             <template #content>
-                                <p class="m-0">
-                                    {{ room.description }}
-                                </p>
+                                <div style="font-size: 11pt;">
+                                    <p>{{ room.description.slice(0, 100) }}{{ room.description.length > 100 ? "..." : "" }}</p>
+                                </div>
                             </template>
                             <template #footer>
-                                €{{ room.totalPrice }} for {{  }} nights, price by guest {{ room.perGuest }}, Day €{{ room.unitPrice }}, 
-                                <div class="flex gap-4 mt-1" >
+                                <div style="font-size: 12pt; color: black;">
+                                    <p>
+                                        <i class="pi pi-chart-pie" style="font-size: 0.7rem"></i> {{ room.perGuest ? "Flat rate" : "Per guest rate" }}
+                                    </p>
+                                    <p>
+                                        <i class="pi pi-home" style="font-size: 0.7rem"></i> ${{ room.unitPrice }} per night
+                                    </p>
+                                    <p>
+                                        <i class="pi pi-wallet" style="font-size: 0.7rem"></i> ${{ room.totalPrice }} for {{ (formDateTo.getDay() - formDateFrom.getDay() + 1) == 1 ? "1 night" : (formDateTo.getDay() - formDateFrom.getDay() + 1) + " nights"}}
+                                    </p>
                                 </div>
                             </template>
                         </Card>
@@ -118,7 +130,7 @@ onMounted(() => findAvailableRooms());
                 </div>
             </div>
 
-            <Paginator :rows="2" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[2, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange">
+            <Paginator :rows="4" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[4, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange">
             </Paginator>
         </div>
     </div>  
@@ -126,11 +138,15 @@ onMounted(() => findAvailableRooms());
 
 <style lang="css" scoped>
 
+.p-card {
+    --p-card-caption-gap: 0rem;
+}   
+
 .cards {
     display: flex;
     flex-direction: row;
     gap: 2rem;
-    width: 100%;
+    flex-wrap: wrap;
 }
 
 .find-layout {
@@ -152,7 +168,7 @@ onMounted(() => findAvailableRooms());
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    min-width: 600px;
+    min-width: 400px;
 }
 
 
