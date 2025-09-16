@@ -126,8 +126,7 @@ onMounted(() => findAvailableRooms());
                 </div>
             </div>
 
-            <Paginator :rows="4" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[4, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange">
-            </Paginator>
+            <Paginator :rows="4" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[4, 16, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange"></Paginator>
         </div>
     </div>  
 </template>

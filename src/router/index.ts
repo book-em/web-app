@@ -1,6 +1,5 @@
 import 'vue-router';
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home.vue';
 import UserLogin from '../views/user/UserLogin.vue';
 import UserRegister from '../views/user/UserRegister.vue';
 import UserSettings from '../views/user/UserSettings.vue';
@@ -32,7 +31,7 @@ declare module 'vue-router' {
 }
 
 const routes: RouteRecordRaw[] = [
-    { path: "/", component: Home, meta: { role: "all" } },
+    { path: "/", component: RoomFind, meta: { role: "all" } },
 
     { path: "/login", component: UserLogin, meta: { role: "signed-out" } },
     { path: "/register", component: UserRegister, meta: { role: "signed-out" } },
@@ -45,8 +44,6 @@ const routes: RouteRecordRaw[] = [
 
     { path: `/reservation/new/:id`, component: ReservationCreate, meta: { role: [UserRole.Guest] } },
     { path: `/reservation/user/:id`, component: ReservationsOfGuest, meta: { role: [UserRole.Guest] } },
-
-    { path: '/find', component: RoomFind, meta: { role: "all" } },
 ];
 
 export const router = createRouter({
