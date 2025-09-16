@@ -84,49 +84,45 @@ onMounted(() => findAvailableRooms());
             </FloatLabel>
 
             <Button type="submit" icon="pi pi-search" label="Search"/>
+            <label>{{ info && info.totalHits ? (info.totalHits > 1 ? info.totalHits + " rooms found." : info.totalHits + " room found.") : "No rooms found." }}</label>
         </form>
 
         <div class="right-panel">
-            <div>
-                <div v-if="rooms && rooms.length > 0" class="cards">
-                    <div v-for="room in rooms" :key="room.id">
-                        <Card style="width: 14rem; overflow: hidden;">
-                            <template #header>
-                                <Galleria :value="room.photos" :numVisible="5" :circular="true" :showItemNavigators="true" :showThumbnails="false">
-                                    <template #item="photo">
-                                        <img :src="`http://localhost:8505/img/${photo.item}`" :alt="photo.item" style="width: 100%; height: 10rem; object-fit: cover; display: block;" />
-                                    </template>
-                                </Galleria>
-                            </template>
-                            <template #title>{{ room.name }}</template>
-                            <template #subtitle>
-                                <div style="font-size: 12pt;">
-                                    <p><i class="pi pi-map-marker" style="font-size: 0.7rem"></i> {{ room.address }}</p>
-                                </div>
-                            </template>
-                            <template #content>
-                                <div style="font-size: 11pt;">
-                                    <p>{{ room.description.slice(0, 100) }}{{ room.description.length > 100 ? "..." : "" }}</p>
-                                </div>
-                            </template>
-                            <template #footer>
-                                <div style="font-size: 12pt; color: black;">
-                                    <p>
-                                        <i class="pi pi-chart-pie" style="font-size: 0.7rem"></i> {{ room.perGuest ? "Flat rate" : "Per guest rate" }}
-                                    </p>
-                                    <p>
-                                        <i class="pi pi-home" style="font-size: 0.7rem"></i> ${{ room.unitPrice }} per night
-                                    </p>
-                                    <p>
-                                        <i class="pi pi-wallet" style="font-size: 0.7rem"></i> ${{ room.totalPrice }} for {{ (formDateTo.getDay() - formDateFrom.getDay() + 1) == 1 ? "1 night" : (formDateTo.getDay() - formDateFrom.getDay() + 1) + " nights"}}
-                                    </p>
-                                </div>
-                            </template>
-                        </Card>
-                    </div>
-                </div>
-                <div v-else>
-                    No rooms found.
+            <div v-if="rooms && rooms.length > 0" class="cards">
+                <div v-for="room in rooms" :key="room.id">
+                    <Card style="width: 14rem; overflow: hidden;">
+                        <template #header>
+                            <Galleria :value="room.photos" :numVisible="5" :circular="true" :showItemNavigators="true" :showThumbnails="false">
+                                <template #item="photo">
+                                    <img :src="`http://localhost:8505/img/${photo.item}`" :alt="photo.item" style="width: 100%; height: 10rem; object-fit: cover; display: block;" />
+                                </template>
+                            </Galleria>
+                        </template>
+                        <template #title>{{ room.name }}</template>
+                        <template #subtitle>
+                            <div style="font-size: 12pt;">
+                                <p><i class="pi pi-map-marker" style="font-size: 0.7rem"></i> {{ room.address }}</p>
+                            </div>
+                        </template>
+                        <template #content>
+                            <div style="font-size: 11pt;">
+                                <p>{{ room.description.slice(0, 100) }}{{ room.description.length > 100 ? "..." : "" }}</p>
+                            </div>
+                        </template>
+                        <template #footer>
+                            <div style="font-size: 12pt; color: black;">
+                                <p>
+                                    <i class="pi pi-chart-pie" style="font-size: 0.7rem"></i> {{ room.perGuest ? "Flat rate" : "Per guest rate" }}
+                                </p>
+                                <p>
+                                    <i class="pi pi-home" style="font-size: 0.7rem"></i> ${{ room.unitPrice }} per night
+                                </p>
+                                <p>
+                                    <i class="pi pi-wallet" style="font-size: 0.7rem"></i> ${{ room.totalPrice }} for {{ (formDateTo.getDay() - formDateFrom.getDay() + 1) == 1 ? "1 night" : (formDateTo.getDay() - formDateFrom.getDay() + 1) + " nights"}}
+                                </p>
+                            </div>
+                        </template>
+                    </Card>
                 </div>
             </div>
 
