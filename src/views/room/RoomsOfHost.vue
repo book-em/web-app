@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/auth-store';
 import { useRoute, useRouter } from 'vue-router';
 import { RoomAPI, type RoomDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
+import { RoomImageURL } from '../../api/util';
 
 const router = useRouter();
 const route = useRoute();
@@ -45,7 +46,7 @@ onMounted(() => findByHostId());
                     <div class="flex-items">
                         <div class="preview-grid">
                             <div v-for="img in room.photos.slice(0, 4)" class="preview-item">
-                                <Image :src="`http://localhost:8505/img/${img}`"></Image>
+                                <Image :src="`${RoomImageURL}/img/${img}`"></Image>
                             </div>
                         </div>
                     </div>
