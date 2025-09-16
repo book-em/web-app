@@ -7,6 +7,7 @@ import RoomAvailabilityEditor from '../../components/room/RoomAvailabilityEditor
 import RoomPriceEditor from '../../components/room/RoomPriceEditor.vue';
 import { useAuthStore } from '../../stores/auth-store';
 import { UserRole } from '../../api/user.api';
+import { RoomImageURL } from '../../api/util';
 
 const route = useRoute();
 const router = useRouter();
@@ -82,11 +83,11 @@ const gotoReservation = () => {
                     <Galleria :value="room.photos" :responsiveOptions="galleryResponsiveOptions" :numVisible="5"
                         containerStyle="max-width: 80%; margin: auto;" class="preview-item">
                         <template #item="slotProps">
-                            <Image :src="`http://localhost:8505/img/${slotProps.item}`" preview
+                            <Image :src="`${RoomImageURL}/img/${slotProps.item}`" preview
                                 style="width: 300px; height: 300px; object-fit: cover;" />
                         </template>
                         <template #thumbnail="slotProps">
-                            <img :src="`http://localhost:8505/img/${slotProps.item}`"
+                            <img :src="`${RoomImageURL}/img/${slotProps.item}`"
                                 style="width: 100px; height: 100px; object-fit: cover;" />
                         </template>
                     </Galleria>
