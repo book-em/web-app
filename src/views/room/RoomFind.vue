@@ -32,14 +32,15 @@ const findAvailableRooms = () => {
     });
 }
 
-const onPageSizeChange = (newValue: number) => {
-    paginatorPageSize.value = newValue;
-    findAvailableRooms()
-}
+const onPageChange = (event: PageState) => {
+    let pageNumberChanged = event.page + 1 != paginatorPageNumber.value;
+    let pageSizeChanged = event.rows != paginatorPageSize.value;
 
-const onPageNumberChange = (event: PageState) => {
-    paginatorPageNumber.value = event.page + 1;
-    findAvailableRooms()
+    if (pageNumberChanged || pageSizeChanged) {
+        paginatorPageSize.value = event.rows;
+        paginatorPageNumber.value = event.page + 1;
+        findAvailableRooms()
+    }
 }
 
 const onFromDateChanged = () => {
@@ -126,7 +127,7 @@ onMounted(() => findAvailableRooms());
                 </div>
             </div>
 
-            <Paginator :rows="4" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[4, 16, 48]" @page="onPageNumberChange" @update:rows="onPageSizeChange"></Paginator>
+            <Paginator :rows="4" :totalRecords="info ? info.totalHits : 0" :rowsPerPageOptions="[4, 16, 48]" @page="onPageChange"></Paginator>
         </div>
     </div>  
 </template>
