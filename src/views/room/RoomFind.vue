@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { RoomAPI, type PaginatedResultInfoDTO, type QueryRoomsDTO, type RoomResultDTO, type RoomsResultDTO } from '../../api/room.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { PageState } from 'primevue';
@@ -13,6 +13,7 @@ const formDateFrom = ref<Date>(new Date());
 const formDateTo = ref<Date>(new Date());
 const formAddress = ref<string>('');
 const formGuests = ref<number>(1);
+const nights = ref<number>(1);
 
 const findAvailableRooms = () => {
     const queryDTO = {
@@ -53,6 +54,14 @@ const onFromDateChanged = () => {
         formDateTo.value = dateToNew;
     }
 }
+
+watch([formDateFrom, formDateTo], () => {
+    formDateFrom.value.setHours(0, 0, 0, 0);
+    formDateTo.value.setHours(0, 0, 0, 0);
+    nights.value = formDateTo.value.getTime() - formDateFrom.value.getTime();
+    nights.value = nights.value / (1000*3600*24);
+    nights.value += 1;
+});
 
 onMounted(() => findAvailableRooms());
 
@@ -119,7 +128,7 @@ onMounted(() => findAvailableRooms());
                                     <i class="pi pi-home" style="font-size: 0.7rem"></i> ${{ room.unitPrice }} per night
                                 </p>
                                 <p>
-                                    <i class="pi pi-wallet" style="font-size: 0.7rem"></i> ${{ room.totalPrice }} for {{ (formDateTo.getDay() - formDateFrom.getDay() + 1) == 1 ? "1 night" : (formDateTo.getDay() - formDateFrom.getDay() + 1) + " nights"}}
+                                    <i class="pi pi-wallet" style="font-size: 0.7rem"></i> ${{ room.totalPrice }} for {{ nights  == 1 ? "1 night" : nights + " nights"}}
                                 </p>
                             </div>
                         </template>
