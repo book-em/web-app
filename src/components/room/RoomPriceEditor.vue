@@ -70,6 +70,11 @@ const onGuestModeChange = () => {
     roomPriceList.value.perGuest = formPerGuest.value;
 }
 
+const resetDateHours = () => {
+    formDateFrom.value.setHours(0, 0, 0, 0);
+    formDateTo.value.setHours(0, 0, 0, 0);
+}
+
 const onAddPriceItem = () => {
     ensurePriceListExists();
     errorPriceNew.value = "";
@@ -102,6 +107,8 @@ const onAddPriceItem = () => {
             return;
         }
     }
+
+    resetDateHours()
 
     roomPriceList.value.items.push({
         id: 0,
