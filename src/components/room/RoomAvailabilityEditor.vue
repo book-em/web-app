@@ -59,6 +59,11 @@ const ensureAvailabilityExists = () => {
     }
 }
 
+const resetDateHours = () => {
+    formDateFrom.value.setHours(0, 0, 0, 0);
+    formDateTo.value.setHours(0, 0, 0, 0);
+}
+
 const onAddAvailItem = () => {
     ensureAvailabilityExists();
     errorAvailabilityNew.value = "";
@@ -74,6 +79,7 @@ const onAddAvailItem = () => {
             return;
         }
     }
+    resetDateHours();
     roomAvailability.value.items.push({
         id: 0,
         dateFrom: formDateFrom.value.toISOString(),
