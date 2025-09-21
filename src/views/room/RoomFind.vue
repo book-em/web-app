@@ -16,6 +16,8 @@ const formGuests = ref<number>(1);
 const nights = ref<number>(1);
 
 const findAvailableRooms = () => {
+    resetHours();
+
     const queryDTO = {
         address: formAddress.value,
         guestsNumber: formGuests.value,
@@ -56,8 +58,11 @@ const onFromDateChanged = () => {
     }
 }
 
+const resetHours = () => {
     formDateFrom.value.setHours(0, 0, 0, 0);
     formDateTo.value.setHours(0, 0, 0, 0);
+}
+
 const calculateNights = () => {
     nights.value = formDateTo.value.getTime() - formDateFrom.value.getTime();
     nights.value = nights.value / (1000*3600*24);
