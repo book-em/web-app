@@ -28,6 +28,7 @@ const findAvailableRooms = () => {
     RoomAPI.findAvailableRooms(queryDTO).then((res: AxiosResponse<RoomsResultDTO>) => {
         rooms.value = res.data.hits;
         info.value = res.data.info;
+        calculateNights();
     }).catch((err: AxiosError) => {
         console.error(err);
     });
@@ -55,13 +56,13 @@ const onFromDateChanged = () => {
     }
 }
 
-watch([formDateFrom, formDateTo], () => {
     formDateFrom.value.setHours(0, 0, 0, 0);
     formDateTo.value.setHours(0, 0, 0, 0);
+const calculateNights = () => {
     nights.value = formDateTo.value.getTime() - formDateFrom.value.getTime();
     nights.value = nights.value / (1000*3600*24);
     nights.value += 1;
-});
+}
 
 onMounted(() => findAvailableRooms());
 
