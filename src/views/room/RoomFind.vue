@@ -132,7 +132,7 @@ onMounted(() => findAvailableRooms());
                                     <i class="pi pi-chart-pie" style="font-size: 0.7rem"></i> {{ room.perGuest ? "Flat rate" : "Per guest rate" }}
                                 </p>
                                 <p>
-                                    <i class="pi pi-home" style="font-size: 0.7rem"></i> ${{ room.unitPrice }} per night
+                                    <i class="pi pi-home" style="font-size: 0.7rem"></i> ${{ room.unitPrice.toFixed(0) }} per night
                                 </p>
                                 <p>
                                     <i class="pi pi-wallet" style="font-size: 0.7rem"></i> ${{ room.totalPrice }} for {{ nights  == 1 ? "1 night" : nights + " nights"}}
