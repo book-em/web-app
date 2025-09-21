@@ -100,7 +100,8 @@ onMounted(() => findAvailableRooms());
         <div class="right-panel">
             <div v-if="rooms && rooms.length > 0" class="cards">
                 <div v-for="room in rooms" :key="room.id">
-                    <Card style="width: 14rem; overflow: hidden;">
+                    <RouterLink :to="`/room/${room.id}`" style="text-decoration: none;">
+                        <Card style="width: 14rem; overflow: hidden;" :to="`/room/${room.id}`">
                         <template #header>
                             <Galleria :value="room.photos" :numVisible="5" :circular="true" :showItemNavigators="true" :showThumbnails="false">
                                 <template #item="photo">
@@ -133,6 +134,7 @@ onMounted(() => findAvailableRooms());
                             </div>
                         </template>
                     </Card>
+                    </RouterLink>
                 </div>
             </div>
 
