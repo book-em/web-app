@@ -8,6 +8,7 @@ import RoomPriceEditor from '../../components/room/RoomPriceEditor.vue';
 import { useAuthStore } from '../../stores/auth-store';
 import { UserRole } from '../../api/user.api';
 import { RoomImageURL } from '../../api/util';
+import Tag from 'primevue/tag';
 
 const route = useRoute();
 const router = useRouter();
@@ -74,11 +75,28 @@ const gotoReservation = () => {
                     <Button v-on:click="gotoReservation">Book a reservation</Button>
                 </template>
                 <TabPanel value="0">
-                    <p>{{ room.address }}</p>
-                    <p>{{ room.minGuests }} - {{ room.maxGuests }} guests</p>
-                    <ul>
-                        <li v-for="commodity in room.commodities" :key="commodity">{{ commodity }}</li>
-                    </ul>
+                    <div class="room-info">
+                        <div class="room-info-section">
+                            <i class="pi pi-map-marker room-icon"></i>
+                            <span>{{ room.address }}</span>
+                        </div>
+                        <div class="room-info-section">
+                            <i class="pi pi-users room-icon"></i>
+                            <span>{{ room.minGuests }} - {{ room.maxGuests }} guests</span>
+                        </div>
+                        <div class="room-info-section">
+                            <i class="pi pi-list room-icon"></i>
+                            <div class="room-commodities">
+                                <Tag v-for="commodity in room.commodities" :key="commodity" severity="info" :value="commodity"/>
+                            </div>
+                        </div>
+                        <div class="room-info-section auto-approve-status">
+                            <i class="pi pi-check-circle room-icon" v-if="room.autoApprove"></i>
+                            <i class="pi pi-clock room-icon" v-else></i>
+                            <Tag v-if="room.autoApprove" value="Instant booking" />
+                            <Tag v-else class="warning-tag" value="Host approval needed" />
+                        </div>
+                    </div>
 
                     <Galleria :value="room.photos" :responsiveOptions="galleryResponsiveOptions" :numVisible="5"
                         containerStyle="max-width: 80%; margin: auto;" class="preview-item">
@@ -128,5 +146,38 @@ const gotoReservation = () => {
 
 .inline-fields>* {
     flex: 1;
+}
+
+.room-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin: 1.2rem 0;
+    padding: 1rem;
+    background-color: var(--surface-card);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.room-info-section {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.room-icon {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.room-commodities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.warning-tag {
+  background-color: color-mix(in srgb, var(--warning-color) 60%, transparent);
+  color: var(--warning-color-text);
 }
 </style>
