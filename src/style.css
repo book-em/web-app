@@ -12,3 +12,8 @@ html a {
 html a:visited {
   color: blue;
 }
+
+:root {
+  --warning-color: #f7b733;         
+  --warning-color-text: #4b3a00;     
+}
