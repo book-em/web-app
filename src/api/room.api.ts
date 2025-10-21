@@ -11,6 +11,7 @@ export interface RoomDTO {
     maxGuests: number,
     photos: string[],
     commodities: string[],
+    autoApprove: boolean
 }
 
 export interface RoomCreateDTO {
@@ -22,6 +23,7 @@ export interface RoomCreateDTO {
     maxGuests: number,
     photosPayload: string[],
     commodities: string[],
+    autoApprove: boolean
 }
 
 export interface CreateRoomAvailabilityListDTO {

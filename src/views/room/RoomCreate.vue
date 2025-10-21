@@ -6,6 +6,7 @@ import { useAuthStore } from '../../stores/auth-store';
 import { useRouter } from 'vue-router';
 import { RoomAPI, type RoomCreateDTO, type RoomDTO } from '../../api/room.api';
 import type { FileUploadSelectEvent } from 'primevue/fileupload';
+import Checkbox from 'primevue/checkbox';
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -18,7 +19,8 @@ const formDTO = ref<RoomCreateDTO>({
     minGuests: 1,
     maxGuests: 5,
     photosPayload: [],
-    commodities: []
+    commodities: [],
+    autoApprove: false
 });
 
 const errorCommodity = ref('');
@@ -159,6 +161,11 @@ const commoditiesIsInvalid = () => {
 
                 </FloatLabel>
 
+                <div class="checkbox-field">
+                    <Checkbox v-model="formDTO.autoApprove" inputId="autoApprove" binary />
+                    <label for="autoApprove">Automatically approve reservation requests</label>
+                </div>
+
                 <Fieldset legend="Photographs">
                     <div class="image-uploader">
                         <FileUpload name="images[]" mode="basic" accept="image/png,image/jpg,image/jpeg" multiple
@@ -288,5 +295,23 @@ h2 {
 
 .inline-fields>* {
     flex: 1;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center; 
+  gap: 0.5em;
+  margin-top: 1em;
+}
+
+.checkbox-field :deep(.p-checkbox) {
+  /* line-height: 1; */
+  margin-top: -2px;
+}
+
+.checkbox-field label {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text-color, #333); 
 }
 </style>
