@@ -3,16 +3,19 @@
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth-store';
-import { ReservationAPI, ReservationRequestStatus, type CreateReservationRequestDTO, type ReservationRequestDTO } from '../../api/reservation.api';
+import { ReservationAPI, ReservationRequestStatus, type ReservationDTO, type CreateReservationRequestDTO, type ReservationRequestDTO } from '../../api/reservation.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useToast } from 'primevue';
 
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
+
+const reservations = ref<ReservationDTO[]>([]);  
 const reservationRequests = ref<ReservationRequestDTO[]>([]);
 const userId = ref(-1);
 
+const reservationsError = ref(''); 
 const reservationRequestError = ref('');
 const loading = ref(false);
 
@@ -30,7 +33,16 @@ onMounted(() => {
 
 const loadReservations = () => {
     loading.value = true;
+    reservationsError.value = '';
     reservationRequestError.value = '';
+
+    ReservationAPI.getActiveReservationsByGuest().then((res: AxiosResponse<ReservationDTO[]>) => {
+        reservations.value = res.data;
+    }).catch((err: AxiosError) => {
+        reservationsError.value = err.message;
+    }).finally(() => {
+        loading.value = false;
+    });
 
     ReservationAPI.getRequestsByGuest().then((res: AxiosResponse<ReservationRequestDTO[]>) => {
         reservationRequests.value = res.data;
@@ -39,6 +51,10 @@ const loadReservations = () => {
     }).finally(() => {
         loading.value = false;
     });
+}
+
+const deleteResrvation = (reservationRequestId: number) => {
+    // TODO: Implement
 }
 
 const deleteRequest = (reservationRequestId: number) => {
@@ -55,25 +71,67 @@ const deleteRequest = (reservationRequestId: number) => {
     <ProgressBar v-if="loading"></ProgressBar>
 
     <h3>Your reservations</h3>
-    <div v-if="true">
+    <div v-if="reservations.length === 0">
         You have no reservations.
     </div>
-    <div>
+    <DataTable v-else :value="reservations" tableStyle="width: 100%; margin: auto">
+        <Column field="roomId" header="Room ID">
+            <template #body="slotProps">
+                <RouterLink :to="`/room/${slotProps.data.roomId}`">#{{ slotProps.data.roomId }}</RouterLink>
+            </template>
+        </Column>
+        <Column field="dateFrom" style="width: 18rem">
+            <template #header>
+                Start day <i class="pi pi-forward"></i>
+            </template>
+            <template #body="slotProps">
+                {{ new Date(slotProps.data.dateFrom).toDateString() }}
+            </template>
+        </Column>
+        <Column field="dateTo" style="width: 18rem">
+            <template #header>
+                <i class="pi pi-backward"></i> End day
+            </template>
+            <template #body="slotProps">
+                {{ new Date(slotProps.data.dateTo).toDateString() }}
+            </template>
+        </Column>
+        <Column field="guestCount">
+            <template #header>
+                <i class="pi pi-users"></i> Guests
+            </template>
+        </Column>
+        <Column field="cost">
+            <template #header>
+                <i class="pi pi-money-bill"></i> Cost
+            </template>
+            <template #body="slotProps">
+                ${{ slotProps.data.cost }}
+            </template>
+        </Column>
+        <Column header="Delete">
+            <template #body="slotProps">
+                <Button v-on:click="deleteResrvation(slotProps.data.id)" severity="danger">Delete</Button>
+            </template>
+        </Column>
+    </DataTable>
 
-    </div>
+    <Message v-show="reservationsError.length > 0" severity="error" size="small" variant="simple">
+        {{ reservationsError }}
+    </Message>
 
     <h3>Your requests</h3>
     <div>
-        <div v-if="reservationRequests.length == 0">
+        <div v-if="reservationRequests.length === 0">
             You have no active reservation requests.
         </div>
-        <DataTable v-else :value="reservationRequests" tableStyle="width: 80%; margin: auto">
+        <DataTable v-else :value="reservationRequests" tableStyle="width: 100%; margin: auto">
             <Column field="roomId" header="Room ID">
                 <template #body="slotProps">
                     <RouterLink :to="`/room/${slotProps.data.roomId}`">#{{ slotProps.data.roomId }}</RouterLink>
                 </template>
             </Column>
-            <Column field="dateFrom">
+            <Column field="dateFrom" style="width: 18rem">
                 <template #header>
                     Start day <i class="pi pi-forward"></i>
                 </template>
@@ -81,7 +139,8 @@ const deleteRequest = (reservationRequestId: number) => {
                     {{ new Date(slotProps.data.dateFrom).toDateString() }}
                 </template>
             </Column>
-            <Column field="dateTo">
+
+            <Column field="dateTo" style="width: 18rem">
                 <template #header>
                     <i class="pi pi-backward"></i> End day
                 </template>
