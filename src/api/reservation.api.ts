@@ -49,6 +49,10 @@ export class ReservationAPI {
         return axiosInstanceReservations.get('/reservations/guest/active');
     }
 
+    static getActiveReservationsByHost(): Promise<AxiosResponse<ReservationDTO[]>> {
+        return axiosInstanceReservations.get('/reservations/host/active');
+    }
+
     static getRequestsByRoom(roomId: number): Promise<AxiosResponse<ReservationRequestDTO[]>> {
         return axiosInstanceReservations.get(`/req/room/${roomId}`);
     }
