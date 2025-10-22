@@ -31,8 +31,20 @@ const acceptRequest = (reservationRequestId: number) => {
 }
 
 const rejectRequest = (reservationRequestId: number) => {
-    // TODO: Implement
-}
+    loading.value = true;
+    requestsError.value = '';
+
+    ReservationAPI.rejectRequest(reservationRequestId)
+        .then(() => {
+            loadRequests();
+        })
+        .catch((err: AxiosError) => {
+            requestsError.value = err.message;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
 </script>
 
 <template>
@@ -87,5 +99,4 @@ const rejectRequest = (reservationRequestId: number) => {
     </Message>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

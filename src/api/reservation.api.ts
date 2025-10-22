@@ -66,4 +66,8 @@ export class ReservationAPI {
             params: { from, to },
         });
     }
+
+    static rejectRequest(id: number): Promise<AxiosResponse<void>> {
+        return axiosInstanceReservations.put(`/req/${id}/reject`);
+    }
 }
