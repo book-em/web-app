@@ -9,6 +9,7 @@ import { useAuthStore } from '../../stores/auth-store';
 import { UserRole } from '../../api/user.api';
 import { RoomImageURL } from '../../api/util';
 import Tag from 'primevue/tag';
+import RoomActiveRequestEditor from '../../components/room/RoomActiveRequestEditor.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -67,6 +68,7 @@ const gotoReservation = () => {
                 <template v-if="auth.role == UserRole.Host">
                     <Tab value="1"><i class="pi pi-calendar"> Availability</i></Tab>
                     <Tab value="2"><i class="pi pi-dollar"> Price</i></Tab>
+                    <Tab v-if="!room.autoApprove" value="3"><i class="pi pi-question-circle room-icon"> Reservation requests</i></Tab>
                 </template>
             </TabList>
 
@@ -117,6 +119,10 @@ const gotoReservation = () => {
 
                 <TabPanel value="2">
                     <RoomPriceEditor :roomId="room.id" />
+                </TabPanel>
+
+                <TabPanel value="3">
+                    <RoomActiveRequestEditor :roomId="room.id" />
                 </TabPanel>
             </TabPanels>
         </Tabs>
