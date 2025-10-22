@@ -17,10 +17,9 @@ const userId = ref(-1);
 
 onMounted(() => {
     auth.checkLocalStorage();
+    userId.value = auth.id
 
-    userId.value = parseInt(route.params.id as string);
-
-    if (auth.id != userId.value) {
+    if (auth.id !== userId.value) {
         router.push('/');
     }
 
