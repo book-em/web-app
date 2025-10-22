@@ -70,4 +70,8 @@ export class ReservationAPI {
     static rejectRequest(id: number): Promise<AxiosResponse<void>> {
         return axiosInstanceReservations.put(`/req/${id}/reject`);
     }
+
+    static approveRequest(id: number): Promise<AxiosResponse<any>> {
+        return axiosInstanceReservations.put(`/req/${id}/approve`);
+    }
 }

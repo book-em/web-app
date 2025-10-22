@@ -27,8 +27,21 @@ const loadRequests = () => {
 };
 
 const acceptRequest = (reservationRequestId: number) => {
-    // TODO: Implement
-}
+    loading.value = true;
+    requestsError.value = '';
+
+    ReservationAPI.approveRequest(reservationRequestId)
+        .then(() => {
+            loadRequests();
+        })
+        .catch((err: AxiosError) => {
+            requestsError.value = err.message;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
 
 const rejectRequest = (reservationRequestId: number) => {
     loading.value = true;
