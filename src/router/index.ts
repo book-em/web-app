@@ -12,6 +12,7 @@ import RoomsOfHost from '../views/room/RoomsOfHost.vue';
 import ReservationCreate from '../views/reservation/ReservationCreate.vue';
 import ReservationsOfGuest from '../views/reservation/ReservationsOfGuest.vue';
 import RoomFind from '../views/room/RoomFind.vue';
+import ReservationsOfHost from '../views/reservation/ReservationsOfHost.vue';
 
 /**
  * A special type for route guards.
@@ -41,6 +42,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/new-room', component: RoomCreate, meta: { role: [UserRole.Host] } },
     { path: '/room/:id', component: RoomDetails, meta: { role: 'all' } },
     { path: '/my-rooms', component: RoomsOfHost, meta: { role: [UserRole.Host] } },
+    { path: '/reservation/host/:id', component: ReservationsOfHost, meta: { role: [UserRole.Host] } },
 
     { path: `/reservation/new/:id`, component: ReservationCreate, meta: { role: [UserRole.Guest] } },
     { path: `/reservation/user/:id`, component: ReservationsOfGuest, meta: { role: [UserRole.Guest] } },
