@@ -53,12 +53,16 @@ const loadReservations = () => {
     });
 }
 
-const deleteResrvation = (reservationRequestId: number) => {
-    // TODO: Implement
+const deleteResrvation = (reservationId: number) => {
+    ReservationAPI.cancelReservation(reservationId).then(() => {
+        loadReservations();
+    }).catch((err: AxiosError) => {
+        reservationRequestError.value = err.message;
+    });
 }
 
 const deleteRequest = (reservationRequestId: number) => {
-    ReservationAPI.deleteRequest(reservationRequestId).then((res) => {
+    ReservationAPI.deleteRequest(reservationRequestId).then(() => {
         loadReservations();
     }).catch((err: AxiosError) => {
         reservationRequestError.value = err.message;
@@ -111,7 +115,7 @@ const deleteRequest = (reservationRequestId: number) => {
         </Column>
         <Column header="Delete">
             <template #body="slotProps">
-                <Button v-on:click="deleteResrvation(slotProps.data.id)" severity="danger">Delete</Button>
+                <Button v-on:click="deleteResrvation(slotProps.data.id)" :disabled="new Date(slotProps.data.dateFrom) <= new Date()" severity="danger">Delete</Button>
             </template>
         </Column>
     </DataTable>
