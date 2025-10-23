@@ -74,4 +74,8 @@ export class ReservationAPI {
     static approveRequest(id: number): Promise<AxiosResponse<any>> {
         return axiosInstanceReservations.put(`/req/${id}/approve`);
     }
+
+    static cancelReservation(reservationId: number): Promise<AxiosResponse<any>> {
+        return axiosInstanceReservations.delete(`/reservations/${reservationId}/cancel`);
+    }
 }

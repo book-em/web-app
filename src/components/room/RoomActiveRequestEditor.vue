@@ -65,7 +65,7 @@ const rejectRequest = (reservationRequestId: number) => {
     <div v-if="requests.length === 0">
         You have no active reservation requests for this room.
     </div>
-    <DataTable v-else :value="requests" tableStyle="width: 100%; margin: auto">
+    <DataTable v-else :value="requests" tableStyle="width: 100%; margin: auto; table-layout: fixed">
         <Column field="dateFrom" style="width: 18rem">
             <template #header>
                 Start day <i class="pi pi-forward"></i>
@@ -95,12 +95,17 @@ const rejectRequest = (reservationRequestId: number) => {
                 ${{ slotProps.data.cost }}
             </template>
         </Column>
-        <Column style="width: 4rem">
+        <Column field="guestCancelCount">
+            <template #header>
+                <i class="pi pi-ban"></i> Guest cancellations
+            </template>
+        </Column>
+        <Column style="width: 6rem">
             <template #body="slotProps">
                 <Button v-on:click="acceptRequest(slotProps.data.id)" severity="success">Accept</Button>
             </template>
         </Column>
-        <Column style="width: 4rem">
+        <Column style="width: 6rem">
             <template #body="slotProps">
                 <Button v-on:click="rejectRequest(slotProps.data.id)" severity="danger">Reject</Button>
             </template>
