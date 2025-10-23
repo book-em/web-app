@@ -23,6 +23,7 @@ export interface ReservationRequestDTO {
     guestId: number;
     status: ReservationRequestStatus;
     cost: number;
+    guestCancelCount: number;
 }
 
 export interface ReservationDTO {
