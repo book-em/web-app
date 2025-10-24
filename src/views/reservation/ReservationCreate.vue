@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth-store';
 import { ReservationAPI, ReservationRequestStatus, type CreateReservationRequestDTO, type ReservationRequestDTO } from '../../api/reservation.api';
 import type { AxiosError, AxiosResponse } from 'axios';
-import { type RoomAvailabilityListDTO, type RoomReservationQueryDTO, RoomAPI, type RoomReservationQueryResponseDTO } from '../../api/room.api';
+import { type RoomAvailabilityListDTO, type RoomReservationQueryDTO, RoomAPI, type RoomReservationQueryResponseDTO, type RoomDTO } from '../../api/room.api';
 import HeatmapCalendar from '../../components/HeatmapCalendar.vue';
 import { RefSymbol } from '@vue/reactivity';
 
@@ -12,6 +12,7 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const roomId = ref(-1);
+const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
 const reservationQuery = ref<RoomReservationQueryResponseDTO | null>(null);
 
@@ -31,6 +32,13 @@ onMounted(() => {
     onFromDateChanged();
 
     queryReservationInfo();
+
+    RoomAPI.findById(roomId.value).then((res: AxiosResponse<RoomDTO>) => {
+        room.value = res.data;
+    }).catch((err: AxiosError) => {
+        error.value = 'Could not fetch room data. Check the console';
+        console.error(err);
+    });
 });
 onMounted(() => { formDateTo.value.setDate(formDateFrom.value.getDate() + 7); });
 
@@ -96,7 +104,7 @@ const onSubmitReservationRequest = () => {
     }).catch((err: AxiosError) => {
         console.log(err);
         if (err.status == 409) {
-            error.value = "You already have a reservation booked for this room";
+            error.value = "Cannot book reservation (clashing request or room is occupied right now)";
         } else if (err.status == 400) {
             error.value = "Invalid data, please make sure the room can be booked at this time";
         } else {
@@ -161,9 +169,13 @@ const onGuestCountChange = (newValue: number) => {
             </FloatLabel>
 
             <FloatLabel class="mt-small">
-                <InputNumber id="guestCount" v-model="formGuestCount" class="w-full" :min="1" :max="999" fluid
-                    @input="(e) => { onGuestCountChange(e.value as number); }" />
-                <label for="basePrice">Number of guests</label>
+                <InputNumber id="guestCount" v-model="formGuestCount" class="w-full" :min="room?.minGuests"
+                    :max="room?.maxGuests" fluid @input="(e) => { onGuestCountChange(e.value as number); }" />
+                <label for="basePrice">Number of guests
+                    <template v-if="room !== null">
+                        ({{ room.minGuests }} - {{ room.maxGuests }})
+                    </template>
+                </label>
             </FloatLabel>
             <br />
 
