@@ -23,8 +23,8 @@ export interface NotificationDTO {
 
 export class NotificationAPI {
 
-    static getMyNotifications(): Promise<AxiosResponse<NotificationDTO[]>> {
-        return axiosInstanceNotifications.get("/notifications/10");
+    static getMyNotifications(limit: number, offset: number): Promise<AxiosResponse<NotificationDTO[]>> {
+        return axiosInstanceNotifications.get(`/notifications?limit=${limit}&offset=${offset}`);
     }
 
     static markNotificationAsRead(id: string): Promise<AxiosResponse<void>> {
