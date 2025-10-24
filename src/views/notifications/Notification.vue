@@ -6,28 +6,58 @@ import { NotificationAPI, NotificationType, type NotificationDTO } from '../../a
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
 
-const auth = useAuthStore();
 const notifications = ref<NotificationDTO[]>([]); 
 const notificationError = ref(''); 
 const loading = ref(false); 
 const router = useRouter();
 
+const limit = 5;
+let offset = 0; 
+const hasMore = ref(false);
+
 onMounted(() => {
     loadNotifications();
 });
 
-const loadNotifications = () => {
-    loading.value = true;
-    notificationError.value = '';
+const loadNotifications = (isLoadMore = false) => {
+    if (!isLoadMore) {
+        loading.value = true;
+        notifications.value = [];
+        offset = 0;
+        hasMore.value = true;
+    }
 
-    NotificationAPI.getMyNotifications().then((res: AxiosResponse<NotificationDTO[]>) => {
-        notifications.value = res.data;
-    }).catch((err: AxiosError) => {
-        notificationError.value = err.message;
-    }).finally(() => {
-        loading.value = false;
-    });
-}
+    NotificationAPI.getMyNotifications(limit, offset)
+        .then((res: AxiosResponse<NotificationDTO[]>) => {
+            const newNotifications = res.data || [];
+            
+            if (newNotifications.length === 0) {
+                hasMore.value = false; 
+                return;
+            }
+
+            if (newNotifications.length < limit) {
+                hasMore.value = false; 
+            }
+
+            notifications.value = isLoadMore 
+                ? [...notifications.value, ...newNotifications] 
+                : newNotifications;
+
+            offset += newNotifications.length; 
+        })
+        .catch((err: AxiosError) => {
+            if (!isLoadMore) notificationError.value = err.message;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+
+const loadMore = () => {
+    if (hasMore.value) loadNotifications(true);
+};
 
 const roomLink = (roomId: number) => {
   return `<a href="#" onclick="event.preventDefault(); window.__goToRoom(${roomId});">${roomId}</a>`;
@@ -87,7 +117,7 @@ const notificationClass = (type: NotificationType) => {
       return 'border-orange';
     case NotificationType.HostReviewed:
     case NotificationType.RoomReviewed:
-      return 'border-yellow';
+      return 'border-purple';
     default:
       return 'border-gray';
   }
@@ -122,6 +152,12 @@ const notificationClass = (type: NotificationType) => {
                 </span>
             </div>
         </div>
+    </div>
+
+    <div v-if="hasMore && !loading" class="load-more-wrapper">
+      <button @click="loadMore" class="p-button p-component p-button-text">
+          Load More
+      </button>
     </div>
 
     <Message
@@ -163,7 +199,7 @@ const notificationClass = (type: NotificationType) => {
 .notification-item.border-red { border-left-color: #ef4444; } /* red-500 */
 .notification-item.border-blue { border-left-color: #3b82f6; } /* blue-500 */
 .notification-item.border-orange { border-left-color: #f97316; } /* orange-500 */
-.notification-item.border-yellow { border-left-color: #f59e0b; } /* amber-500 */
+.notification-item.border-purple { border-left-color: #be0bf5; } /* purple-500 */
 .notification-item.border-gray { border-left-color: #9ca3af; } /* gray */
 
 .notification-content { flex: 1; }
@@ -175,5 +211,10 @@ const notificationClass = (type: NotificationType) => {
 .status-tag { padding: 0.2rem 0.6rem; border-radius: 10px; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
 .status-tag.read { background-color: #e5e7eb; color: #374151; }
 .status-tag.unread { background-color: #ef4444; color: white; }
+
+.load-more-wrapper {
+  text-align: center;
+  margin-top: 1rem;
+}
 
 </style>
