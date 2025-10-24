@@ -60,13 +60,13 @@ const computeNavbar = () => {
             case UserRole.Guest:
                 navbarItems.value.push({ label: 'My Reservations', icon: 'pi pi-book', command: () => goto(`/reservation/user/${auth.id}`) });
                 navbarItems.value.push({ label: 'History', icon: 'pi pi-history', command: () => goto('/') });
-                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/') });
+                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/notifications') });
                 break;
             case UserRole.Host:
                 navbarItems.value.push({ label: 'New Room', icon: 'pi pi-plus-circle', command: () => goto('/new-room') });
                 navbarItems.value.push({ label: 'My Rooms', icon: 'pi pi-building', command: () => goto('/my-rooms') });
                 navbarItems.value.push({ label: 'Reservations', icon: 'pi pi-address-book', command: () => goto(`/reservation/host`) });
-                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/') });
+                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/notifications') });
                 navbarItems.value.push({ label: 'Ratings', icon: 'pi pi-star', command: () => goto('/') });
                 break;
         }
