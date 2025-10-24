@@ -4,11 +4,13 @@ import { onMounted, ref } from 'vue';
 import { useAuthStore } from '../../stores/auth-store';
 import { NotificationAPI, NotificationType, type NotificationDTO } from '../../api/notification.api';
 import type { AxiosError, AxiosResponse } from 'axios';
+import { useRouter } from 'vue-router';
 
 const auth = useAuthStore();
 const notifications = ref<NotificationDTO[]>([]); 
 const notificationError = ref(''); 
 const loading = ref(false); 
+const router = useRouter();
 
 onMounted(() => {
     loadNotifications();
@@ -27,20 +29,32 @@ const loadNotifications = () => {
     });
 }
 
+const roomLink = (roomId: number) => {
+  return `<a href="#" onclick="event.preventDefault(); window.__goToRoom(${roomId});">${roomId}</a>`;
+};
+
+(window as any).__goToRoom = (id: number) => {
+  goToRoom(id);
+};
+
+const goToRoom = (roomId: number) => {
+  router.push(`/room/${roomId}`);
+};
+
 const formatMessage = (n: NotificationDTO) => {
   switch (n.type) {
     case NotificationType.ReservationRequested:
-      return `User ${n.subject} requested a reservation for room ${n.object}`;
+      return `User ${n.subject} requested a reservation for room ${roomLink(n.object)}`;
     case NotificationType.ReservationCancelled:
-      return `User ${n.subject} cancelled the reservation for room ${n.object}`;
+      return `User ${n.subject} cancelled the reservation for room ${roomLink(n.object)}`;
     case NotificationType.HostReviewed:
-      return `User ${n.subject} left a review for you`;
+      return `User ${n.subject} reviewed you with ${n.starsNumber} stars.`;
     case NotificationType.RoomReviewed:
-      return `User ${n.subject} reviewed your room ${n.object}`;
+      return `User ${n.subject} reviewed your room ${roomLink(n.object)} with ${n.starsNumber} stars.`;
     case NotificationType.ReservationAccepted:
-      return `Your reservation request for room ${n.object} was accepted by host ${n.subject}`;
+      return `Your reservation request for room ${roomLink(n.object)} was accepted.`;
     case NotificationType.ReservationDeclined:
-      return `Your reservation request for room ${n.object} was declined by host ${n.subject}`;
+      return `Your reservation request for room ${roomLink(n.object)} was declined.`;
     default:
       return `Notification type: ${n.type}`;
   }
@@ -61,6 +75,23 @@ const handleClick = async (n: NotificationDTO) => {
   }
 };
 
+const notificationClass = (type: NotificationType) => {
+  switch (type) {
+    case NotificationType.ReservationAccepted:
+      return 'border-green';
+    case NotificationType.ReservationDeclined:
+      return 'border-red';
+    case NotificationType.ReservationRequested:
+      return 'border-blue';
+    case NotificationType.ReservationCancelled:
+      return 'border-orange';
+    case NotificationType.HostReviewed:
+    case NotificationType.RoomReviewed:
+      return 'border-yellow';
+    default:
+      return 'border-gray';
+  }
+};
 
 </script>
 
@@ -68,7 +99,7 @@ const handleClick = async (n: NotificationDTO) => {
 
     <ProgressBar v-if="loading"></ProgressBar>
 
-    <h3>My Notifications</h3>
+    <h3>Your Notifications</h3>
 
     <div v-if="notifications.length === 0">
         You currently have no notifications.
@@ -78,11 +109,19 @@ const handleClick = async (n: NotificationDTO) => {
         v-for="n in notifications"
         :key="n.id"
         class="notification-item"
-        :class="{ unread: !n.isRead }"
+        :class="[notificationClass(n.type), { unread: !n.isRead }]"
         @click="handleClick(n)"
     >
-        <div class="message">{{ formatMessage(n) }}</div>
-        <div class="time">{{ formatTime(n.createdAt) }}</div>
+        <div class="notification-content">
+            <div class="message" v-html="formatMessage(n)"></div>
+
+            <div class="meta">
+                <span class="time">{{ formatTime(n.createdAt) }}</span>
+                <span class="status-tag" :class="n.isRead ? 'read' : 'unread'">
+                {{ n.isRead ? 'Read' : 'Unread' }}
+                </span>
+            </div>
+        </div>
     </div>
 
     <Message
@@ -97,28 +136,44 @@ const handleClick = async (n: NotificationDTO) => {
 </template>
 
 <style scoped>
+
 .notification-item {
   padding: 1rem;
-  border-bottom: 1px solid #ccc;
-  cursor: pointer;
-  transition: background 0.2s;
+  border-left: 6px solid;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+  background-color: #f9fafb; 
+  transition: background 0.18s, transform 0.06s;
+  display: flex;
+  align-items: flex-start;
 }
 
-.notification-item:hover {
-  background-color: #f6f6f6;
+.notification-item.unread:hover {
+  background-color: #ffe6ea; 
+  transform: translateY(-1px);
 }
 
 .notification-item.unread {
-  background-color: #e8f0ff;
-  font-weight: 600;
+  background-color: #fff1f2;
+  cursor: pointer;
 }
 
-.message {
-  margin-bottom: 0.3rem;
-}
+/* Left-border colors per type */
+.notification-item.border-green { border-left-color: #10b981; } /* emerald */
+.notification-item.border-red { border-left-color: #ef4444; } /* red-500 */
+.notification-item.border-blue { border-left-color: #3b82f6; } /* blue-500 */
+.notification-item.border-orange { border-left-color: #f97316; } /* orange-500 */
+.notification-item.border-yellow { border-left-color: #f59e0b; } /* amber-500 */
+.notification-item.border-gray { border-left-color: #9ca3af; } /* gray */
 
-.time {
-  font-size: 0.8rem;
-  color: gray;
-}
+.notification-content { flex: 1; }
+.message { font-size: 1rem; margin-bottom: 0.4rem; color: #111827; }
+
+.meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #6b7280; }
+.time { margin-right: 0.6rem; }
+
+.status-tag { padding: 0.2rem 0.6rem; border-radius: 10px; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+.status-tag.read { background-color: #e5e7eb; color: #374151; }
+.status-tag.unread { background-color: #ef4444; color: white; }
+
 </style>
