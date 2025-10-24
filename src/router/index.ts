@@ -13,6 +13,7 @@ import ReservationCreate from '../views/reservation/ReservationCreate.vue';
 import ReservationsOfGuest from '../views/reservation/ReservationsOfGuest.vue';
 import RoomFind from '../views/room/RoomFind.vue';
 import ReservationsOfHost from '../views/reservation/ReservationsOfHost.vue';
+import Notification from '../views/notifications/Notification.vue';
 
 /**
  * A special type for route guards.
@@ -38,6 +39,7 @@ const routes: RouteRecordRaw[] = [
     { path: "/register", component: UserRegister, meta: { role: "signed-out" } },
 
     { path: "/my-settings", component: UserSettings, meta: { role: "signed-in" } },
+    { path: "/notifications", component: Notification, meta: { role: 'signed-in' } },
 
     { path: '/new-room', component: RoomCreate, meta: { role: [UserRole.Host] } },
     { path: '/room/:id', component: RoomDetails, meta: { role: 'all' } },
