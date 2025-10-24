@@ -1,0 +1,34 @@
+import type { AxiosResponse } from "axios";
+import { axiosInstanceNotifications, axiosInstanceReservations } from "./util";
+
+export enum NotificationType {
+  ReservationRequested = "reservation_requested",
+  ReservationCancelled = "reservation_cancelled",
+  HostReviewed = "host_reviewed",
+  RoomReviewed = "room_reviewed",
+  ReservationAccepted = "reservation_accepted",
+  ReservationDeclined = "reservation_declined",
+}
+
+export interface NotificationDTO {
+  id: string;
+  receiverId: number;
+  type: NotificationType;
+  subject: number;
+  object?: number;
+  starsNumber?: number;
+  isRead: boolean;
+  createdAt: string; 
+}
+
+export class NotificationAPI {
+
+    static getMyNotifications(): Promise<AxiosResponse<NotificationDTO[]>> {
+        return axiosInstanceNotifications.get("/notifications/10");
+    }
+
+    static markNotificationAsRead(id: string): Promise<AxiosResponse<void>> {
+        return axiosInstanceNotifications.put(`/notifications/${id}/read`);
+    }
+
+}
