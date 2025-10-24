@@ -48,7 +48,6 @@ export const RoomImageURL: string = (window.__ENV__?.VITE_ROOM_SERVICE_IMAGES_UR
 export const axiosInstanceReservations = axios.create({
     baseURL: (window.__ENV__?.VITE_RESERVATION_SERVICE_URL || "http://localhost:8506") + "/api",
 });
-
 axiosInstanceReservations.interceptors.request.use(
     config => {
         const token = localStorage.getItem('jwt');
@@ -60,6 +59,24 @@ axiosInstanceReservations.interceptors.request.use(
     error => Promise.reject(error)
 );
 axiosInstanceReservations.interceptors.response.use(
+    response => response,
+    error => Promise.reject(error)
+);
+
+export const axiosInstanceNotifications = axios.create({
+    baseURL: (window.__ENV__?.VITE_NOTIFICATION_SERVICE_URL || "http://localhost:8508") + "/api",
+});
+axiosInstanceNotifications.interceptors.request.use(
+    config => {
+        const token = localStorage.getItem('jwt');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    error => Promise.reject(error)
+);
+axiosInstanceNotifications.interceptors.response.use(
     response => response,
     error => Promise.reject(error)
 );
