@@ -151,7 +151,7 @@ const onGuestCountChange = (newValue: number) => {
             <FloatLabel class="mt-small">
                 <label for="fromDate">From</label>
                 <DatePicker id="fromDate" v-model="formDateFrom" v-on:value-change="onFromDateChanged"
-                    date-format="dd MM" showIcon class="w-full" />
+                    date-format="dd MM" showIcon class="w-full" :min-date="new Date()" />
             </FloatLabel>
 
             <FloatLabel class="mt-small">
