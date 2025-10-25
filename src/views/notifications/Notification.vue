@@ -178,9 +178,10 @@ watch(() => notificationStore.unreadCount, async (newCount, oldCount) => {
     </div>
 
     <div v-if="hasMore && !loading" class="load-more-wrapper">
-      <button @click="loadMore" class="p-button p-component p-button-text">
-          Load More
-      </button>
+      <Button class="p-button-outlined" @click="loadMore">
+        Load More
+      </Button>
+
     </div>
 
     <Message
