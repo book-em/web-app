@@ -31,4 +31,8 @@ export class NotificationAPI {
         return axiosInstanceNotifications.put(`/notifications/${id}/read`);
     }
 
+    static getUnreadNotificationCount(): Promise<AxiosResponse<{ unreadCount: number }>> {
+        return axiosInstanceNotifications.get(`/notifications/unread-count`);
+    }
+
 }
