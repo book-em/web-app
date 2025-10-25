@@ -1,17 +1,18 @@
 <script setup lang="ts">
 
-import { onMounted, ref } from 'vue';
-import { useAuthStore } from '../../stores/auth-store';
+import { onMounted, ref, watch } from 'vue';
 import { NotificationAPI, NotificationType, type NotificationDTO } from '../../api/notification.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'vue-router';
+import { useNotificationStore } from '../../stores/notification-store';
 
 const notifications = ref<NotificationDTO[]>([]); 
 const notificationError = ref(''); 
 const loading = ref(false); 
 const router = useRouter();
+const notificationStore = useNotificationStore();
 
-const limit = 5;
+const limit = 10;
 let offset = 0; 
 const hasMore = ref(false);
 
@@ -99,6 +100,7 @@ const handleClick = async (n: NotificationDTO) => {
   if (!n.isRead) {
     NotificationAPI.markNotificationAsRead(n.id).then(() => {
         n.isRead = true;
+        notificationStore.decrementUnread();
     }).catch((err: AxiosError) => {
         console.error(err);
     });
@@ -122,6 +124,27 @@ const notificationClass = (type: NotificationType) => {
       return 'border-gray';
   }
 };
+
+watch(() => notificationStore.unreadCount, async (newCount, oldCount) => {
+  if (newCount > oldCount) { 
+    try {
+      const res = await NotificationAPI.getMyNotifications(10, 0);
+      const newNotifications = res.data.filter(
+        n => !notifications.value.find(old => old.id === n.id)
+      );
+ 
+      if (newNotifications.length > 0) {
+        for (let i = newNotifications.length - 1; i >= 0; i--) {
+          notifications.value.unshift(newNotifications[i]);
+        }
+        offset += newNotifications.length;
+      }
+    } catch (err) {
+      console.error('Failed to fetch new notifications:', err);
+    }
+  }
+});
+
 
 </script>
 

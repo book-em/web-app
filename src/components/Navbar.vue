@@ -1,18 +1,42 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, onUnmounted } from 'vue';
 import { useAuthStore } from '../stores/auth-store';
 import type { MenuItem } from 'primevue/menuitem';
 import { UserRole } from '../api/user.api';
 import { useRouter } from 'vue-router';
+import { NotificationAPI } from '../api/notification.api'; 
+import { useNotificationStore } from '../stores/notification-store';
 
+
+const notificationStore = useNotificationStore();
 const auth = useAuthStore();
 const navbarItems = ref<MenuItem[]>([]);
 const router = useRouter();
+let pollingInterval: number | undefined;
+
 
 onMounted(() => {
     auth.checkLocalStorage();
     computeNavbar();
+    fetchUnreadNotifications(); 
+    pollingInterval = window.setInterval(fetchUnreadNotifications, 7000);
 });
+
+onUnmounted(() => {
+    if (pollingInterval) clearInterval(pollingInterval);
+    notificationStore.setUnreadCount(0);
+});
+
+
+const fetchUnreadNotifications = async () => {
+    try {
+        const res = await NotificationAPI.getUnreadNotificationCount(); 
+        notificationStore.setUnreadCount(res.data.unreadCount);
+        console.log("Unread notifications:", res.data.unreadCount);
+    } catch (err) {
+        console.error("Failed to fetch unread notifications", err);
+    }
+};
 
 watch(() => auth.role, (newValue, oldValue) => {
     computeNavbar();
@@ -23,6 +47,7 @@ watch(() => auth.isLoggedIn, (newValue, oldValue) => {
 watch(() => auth.id, (newValue, oldValue) => {
     computeNavbar();
 });
+watch(() => notificationStore.unreadCount, () => {computeNavbar();});
 
 const logOut = () => {
     auth.logout();
@@ -60,13 +85,15 @@ const computeNavbar = () => {
             case UserRole.Guest:
                 navbarItems.value.push({ label: 'My Reservations', icon: 'pi pi-book', command: () => goto(`/reservation/user/${auth.id}`) });
                 navbarItems.value.push({ label: 'History', icon: 'pi pi-history', command: () => goto('/') });
-                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/notifications') });
+                navbarItems.value.push({ label: 'Notifications' + (notificationStore.unreadCount > 0 ? ` (${notificationStore.unreadCount})` : ''),
+                 icon: 'pi' + (notificationStore.unreadCount > 0 ? ` pi-exclamation-circle` : ' pi-bell'), command: () => goto('/notifications') });
                 break;
             case UserRole.Host:
                 navbarItems.value.push({ label: 'New Room', icon: 'pi pi-plus-circle', command: () => goto('/new-room') });
                 navbarItems.value.push({ label: 'My Rooms', icon: 'pi pi-building', command: () => goto('/my-rooms') });
                 navbarItems.value.push({ label: 'Reservations', icon: 'pi pi-address-book', command: () => goto(`/reservation/host`) });
-                navbarItems.value.push({ label: 'Notifications', icon: 'pi pi-bell', command: () => goto('/notifications') });
+                navbarItems.value.push({ label: 'Notifications' + (notificationStore.unreadCount > 0 ? ` (${notificationStore.unreadCount})` : ''),
+                 icon: 'pi' + (notificationStore.unreadCount > 0 ? ` pi-exclamation-circle` : ' pi-bell'), command: () => goto('/notifications') });
                 navbarItems.value.push({ label: 'Ratings', icon: 'pi pi-star', command: () => goto('/') });
                 break;
         }
@@ -124,4 +151,9 @@ const menubarClass = computed(() => {
     padding-bottom: 0.5em;
     border-bottom: 1px solid var(--p-text-color);
 }
+
+:deep(.pi-exclamation-circle) {
+  color: red !important;
+}
+
 </style>
