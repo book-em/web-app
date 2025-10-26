@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { UserAPI, UserRole, type UserChangePasswordDTO, type UserDTO, type UserUpdateDTO } from '../../api/user.api';
 import type { AxiosError, AxiosResponse } from 'axios';
 import { useAuthStore } from '../../stores/auth-store';
 import { useRouter } from 'vue-router';
+import { allowedTypesByRole, NotificationAPI, NotificationType, type NotificationPreferencesDTO } from '../../api/notification.api';
 
 const router = useRouter();
 const auth = useAuthStore();
 const user = ref<UserDTO>();
+
+const preferences = ref<NotificationPreferencesDTO | null>(null);
+
 const formDTO = ref<UserUpdateDTO>({
     id: 0,
     username: "",
@@ -22,13 +26,24 @@ const formPasswordDTO = ref<UserChangePasswordDTO>({
     newPassword: "",
     newPasswordConfirm: "",
 });
+const typeLabels: Record<NotificationType, string> = {
+  [NotificationType.ReservationRequested]: "Request Reservation",
+  [NotificationType.ReservationCancelled]: "Cancel Reservation",
+  [NotificationType.ReservationAccepted]: "Accept Reservation",
+  [NotificationType.ReservationDeclined]: "Decline Reservation",
+  [NotificationType.HostReviewed]: "Review Host",
+  [NotificationType.RoomReviewed]: "Review Room",
+};
+
 const warning = ref('');
 const error = ref('');
 const errorDelete = ref('');
 const errorPassword = ref('');
+const errorPreferences = ref('');
 const formDetailsLoading = ref(false);
 const formPasswordLoading = ref(false);
 const formDeleteLoading = ref(false);
+const preferencesLoading = ref(false);
 
 const usernameIsDifferent = () => user.value?.username != formDTO.value.username;
 
@@ -42,6 +57,15 @@ onMounted(() => {
         formDTO.value = { ...user.value };
         formPasswordDTO.value.id = user.value.id;
     }).catch((err) => { });
+
+    NotificationAPI.getPreferences().then((res: AxiosResponse<NotificationPreferencesDTO>) => {
+        preferences.value = res.data;
+        console.log("loaded preferences:");
+        console.log(preferences.value);
+    }).catch((err) => {
+        errorPreferences.value = "Failed to load preferences.";
+     });
+
 });
 
 const doUpdateUserInfo = () => {
@@ -100,6 +124,22 @@ const doChangePassword = () => {
         formPasswordLoading.value = false;
     });
 }
+
+const doUpdatePreferences = () => {
+    if (!preferences.value) return;
+
+    errorPreferences.value = '';
+    preferencesLoading.value = true;
+
+    NotificationAPI.updatePreferences(preferences.value).then((res: AxiosResponse<NotificationPreferencesDTO>) => {
+        preferences.value = res.data;
+        console.log("updated preferences:");
+        console.log(preferences.value);
+    }).catch((err) => {
+        errorPreferences.value = "Failed to load preferences.";
+    });
+    preferencesLoading.value = false;
+};
 
 const duringUsernameChange = () => {
     if (usernameIsDifferent()) {
@@ -166,6 +206,40 @@ const doDeleteUser = () => {
             </Fieldset>
         </div>
     </Form>
+
+    <Form @submit.prevent="doUpdatePreferences" class="center">
+        <div class="form-div">
+            <Fieldset legend="Choose what notifications you will receive">
+            <div v-if="preferences" class="preferences-container">
+                <div v-for="(enabled, type) in preferences.enabledTypes" :key="type" class="preference-row">
+                    <span class="pref-label">{{ typeLabels[type as NotificationType] || type }}</span>
+
+                    <label class="switch">
+                        <input
+                        type="checkbox"
+                        :checked="enabled"
+                        @change="(e) => preferences.enabledTypes[type] = (e.target as HTMLInputElement).checked"
+                        />
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <Message v-if="!preferences" severity="info" size="small" variant="simple">
+                Loading your preferences...
+            </Message>
+
+            <Button
+                class="btn purple-btn"
+                type="submit"
+                severity="info"
+                :disabled="!preferences">
+                Update Preferences
+            </Button>
+            </Fieldset>
+        </div>
+    </Form>
+
 
     <Form @submit.prevent="doChangePassword" class="center">
         <div class="form-div">
@@ -275,4 +349,85 @@ h2 {
 .panic button {
     float: right;
 }
+
+.preferences-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.preference-row {
+   display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.pref-label {
+  font-weight: 500;
+  color: #111827;
+  font-size: 1rem;
+}
+
+/* --- Toggle Switch Styling --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d1d5db; /* gray-300 */
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #8b5cf6; /* purple */
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+.purple-btn {
+  background-color: #8b5cf6 !important; /* violet-500 */
+  border-color: #7c3aed !important;
+  color: white !important;
+}
+
+.purple-btn:hover {
+  background-color: #7c3aed !important;
+}
+
+
 </style>

@@ -21,6 +21,24 @@ export interface NotificationDTO {
   createdAt: string; 
 }
 
+export interface NotificationPreferencesDTO {
+  userID: number;
+  enabledTypes: Record<NotificationType, boolean>;
+}
+
+export const allowedTypesByRole: Record<string, NotificationType[]> = {
+  host: [
+    NotificationType.ReservationRequested,
+    NotificationType.ReservationCancelled,
+    NotificationType.HostReviewed,
+    NotificationType.RoomReviewed,
+  ],
+  guest: [
+    NotificationType.ReservationAccepted,
+    NotificationType.ReservationDeclined,
+  ],
+};
+
 export class NotificationAPI {
 
     static getMyNotifications(limit: number, offset: number): Promise<AxiosResponse<NotificationDTO[]>> {
@@ -34,5 +52,14 @@ export class NotificationAPI {
     static getUnreadNotificationCount(): Promise<AxiosResponse<{ unreadCount: number }>> {
         return axiosInstanceNotifications.get(`/notifications/unread-count`);
     }
+
+    static getPreferences(): Promise<AxiosResponse<NotificationPreferencesDTO>> {
+        return axiosInstanceNotifications.get("/notification/preferences");
+    }
+
+    static updatePreferences(data: NotificationPreferencesDTO): Promise<AxiosResponse<NotificationPreferencesDTO>> {
+        return axiosInstanceNotifications.put("/notification/preferences", data);
+    }
+
 
 }
