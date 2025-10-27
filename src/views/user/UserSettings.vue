@@ -27,12 +27,12 @@ const formPasswordDTO = ref<UserChangePasswordDTO>({
     newPasswordConfirm: "",
 });
 const typeLabels: Record<NotificationType, string> = {
-  [NotificationType.ReservationRequested]: "Request Reservation",
-  [NotificationType.ReservationCancelled]: "Cancel Reservation",
-  [NotificationType.ReservationAccepted]: "Accept Reservation",
-  [NotificationType.ReservationDeclined]: "Decline Reservation",
-  [NotificationType.HostReviewed]: "Review Host",
-  [NotificationType.RoomReviewed]: "Review Room",
+  [NotificationType.ReservationRequested]: "Reservation Requested",
+  [NotificationType.ReservationCancelled]: "Reservation Cancelled",
+  [NotificationType.ReservationAccepted]: "Reservation Accepted",
+  [NotificationType.ReservationDeclined]: "Reservation Declined",
+  [NotificationType.HostReviewed]: "Host Reviewed",
+  [NotificationType.RoomReviewed]: "Room Reviewed",
 };
 
 const warning = ref('');
