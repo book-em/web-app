@@ -17,6 +17,7 @@ const room = ref<RoomDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
 const auth = useAuthStore();
 const loading = ref(false);
+const error = ref('');
 
 onMounted(() => { auth.checkLocalStorage(); });
 onMounted(() => loadRoom());
@@ -29,6 +30,7 @@ const loadRoom = () => {
     RoomAPI.findById(roomId).then((res: AxiosResponse<RoomDTO>) => {
         room.value = res.data;
     }).catch((err: AxiosError) => {
+        error.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
         console.error(err);
     }).finally(() => {
         loading.value = false;
@@ -58,6 +60,9 @@ const gotoReservation = () => {
     <div v-if="loading">
         <ProgressBar mode="indeterminate" style="height: 6px"></ProgressBar>
     </div>
+
+    <Message v-show="error.length > 0" style="margin: 7px;" severity="error" size="medium" variant="simple">{{ error }}</Message>
+    
     <div v-if="room">
         <h2>{{ room.name }}</h2>
         <p>{{ room.description }}</p>
