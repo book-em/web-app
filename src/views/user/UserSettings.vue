@@ -154,11 +154,11 @@ const doDeleteUser = () => {
 
     formDeleteLoading.value = true;
 
-    UserAPI.deleteById(auth.id).then(() => {
+    UserAPI.delete().then(() => {
         auth.logout();
         router.push("/");
     }).catch((err: AxiosError) => {
-        errorDelete.value = err.response.data as string;
+        errorDelete.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
         console.error(err);
     }).finally(() => {
         formDeleteLoading.value = false;
