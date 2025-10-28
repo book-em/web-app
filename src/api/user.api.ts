@@ -47,7 +47,7 @@ export class UserAPI {
         return axiosInstance.put(`/password`, dto);
     }
 
-    static deleteById(id: number): Promise<AxiosResponse<null>> {
-        return axiosInstance.delete(`/${id}`);
+    static delete(): Promise<AxiosResponse<null>> {
+        return axiosInstance.delete(`/`);
     }
 }
