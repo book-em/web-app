@@ -35,6 +35,8 @@ const doLogin = () => {
     }).catch((err: AxiosError) => {
         if (err.response?.status == 400) {
             error.value = "Unknown user or password";
+        } else if (err.response?.status == 401) {
+            error.value = "Account is deleted";
         } else {
             console.error(err);
             error.value = "Unknown error. Check the console";
