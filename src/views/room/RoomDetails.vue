@@ -5,15 +5,18 @@ import { RoomAPI, type RoomAvailabilityListDTO, type RoomDTO } from '../../api/r
 import type { AxiosError, AxiosResponse } from 'axios';
 import RoomAvailabilityEditor from '../../components/room/RoomAvailabilityEditor.vue';
 import RoomPriceEditor from '../../components/room/RoomPriceEditor.vue';
+import HostRatings from '../../components/EntityRatings.vue';
 import { useAuthStore } from '../../stores/auth-store';
-import { UserRole } from '../../api/user.api';
+import { UserAPI, UserRole, type UserDTO } from '../../api/user.api';
 import { RoomImageURL } from '../../api/util';
 import Tag from 'primevue/tag';
 import RoomActiveRequestEditor from '../../components/room/RoomActiveRequestEditor.vue';
+import EntityRatings from '../../components/EntityRatings.vue';
 
 const route = useRoute();
 const router = useRouter();
 const room = ref<RoomDTO | null>(null);
+const host = ref<UserDTO | null>(null);
 const roomAvailability = ref<RoomAvailabilityListDTO | null>(null);
 const auth = useAuthStore();
 const loading = ref(false);
@@ -22,24 +25,21 @@ const error = ref('');
 onMounted(() => { auth.checkLocalStorage(); });
 onMounted(() => loadRoom());
 
-const loadRoom = () => {
-    const roomId: number = parseInt(route.params.id as string);
+const loadRoom = async () => {
+  const roomId = Number(route.params.id);
+  loading.value = true;
+  try {
+    const roomRes = await RoomAPI.findById(roomId);
+    room.value = roomRes.data;
 
-    loading.value = true;
-
-    RoomAPI.findById(roomId).then((res: AxiosResponse<RoomDTO>) => {
-        room.value = res.data;
-    }).catch((err: AxiosError) => {
-        if (err.response?.status === 404) {
-            error.value = "Room not found or deleted.";
-        } else {
-            error.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
-        }
-        console.error(err);
-    }).finally(() => {
-        loading.value = false;
-    });
-}
+    const hostRes = await UserAPI.findById(room.value.hostID);
+    host.value = hostRes.data;
+  } catch (err) {
+    console.error(err as AxiosError);
+  } finally {
+    loading.value = false;
+  }
+};
 
 const galleryResponsiveOptions = ref([
     {
@@ -74,10 +74,13 @@ const gotoReservation = () => {
         <Tabs value="0">
             <TabList>
                 <Tab value="0"><i class="pi pi-info-circle"> Details</i></Tab>
+
+
                 <template v-if="auth.role == UserRole.Host">
                     <Tab value="1"><i class="pi pi-calendar"> Availability</i></Tab>
                     <Tab value="2"><i class="pi pi-dollar"> Price</i></Tab>
                     <Tab v-if="!room.autoApprove" value="3"><i class="pi pi-question-circle room-icon"> Reservation requests</i></Tab>
+
                 </template>
             </TabList>
 
@@ -120,6 +123,25 @@ const gotoReservation = () => {
                                 style="width: 100px; height: 100px; object-fit: cover;" />
                         </template>
                     </Galleria>
+
+                    <EntityRatings
+                        v-if="room"
+                        target-type="room"
+                        :target-id="room.id"
+                        title="Room Rating"
+                        :primary-name="room.name"
+                    />
+
+                    <EntityRatings
+                        v-if="host"
+                        target-type="host"
+                        :target-id="room.hostID"
+                        title="Host Rating"
+                        :primary-name="host?.name"
+                        :secondary-name="host?.surname"
+
+                    />
+
                 </TabPanel>
 
                 <TabPanel value="1">
