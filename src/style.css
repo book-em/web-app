@@ -17,3 +17,7 @@ html a:visited {
   --warning-color: #f7b733;         
   --warning-color-text: #4b3a00;     
 }
+
+.p-toast {
+  z-index: 9999 !important;
+}
