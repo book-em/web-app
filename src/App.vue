@@ -6,5 +6,6 @@ import Navbar from './components/Navbar.vue';
     <div id="app">
         <Navbar />
         <RouterView />
+        <Toast position="top-right" />
     </div>
 </template>

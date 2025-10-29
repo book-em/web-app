@@ -79,4 +79,8 @@ export class ReservationAPI {
     static cancelReservation(reservationId: number): Promise<AxiosResponse<any>> {
         return axiosInstanceReservations.delete(`/reservations/${reservationId}/cancel`);
     }
+
+    static getPastReservationsByGuest(): Promise<AxiosResponse<ReservationDTO[]>> {
+        return axiosInstanceReservations.get('/reservations/history');
+    }
 }

@@ -31,6 +31,9 @@ import Tab from 'primevue/tab';
 import TabPanels from 'primevue/tabpanels';
 import TabPanel from 'primevue/tabpanel';
 import ProgressBar from 'primevue/progressbar';
+import ToastService from 'primevue/toastservice';
+import Toast from 'primevue/toast';
+
 
 const app = createApp(App);
 
@@ -48,6 +51,7 @@ app.use(PrimeVue, {
         }
     }
 });
+app.use(ToastService)
 app.directive('tooltip', Tooltip);
 app.component('InputText', InputText);
 app.component('Button', Button);
@@ -79,5 +83,5 @@ app.component('TabPanels', TabPanels);
 app.component('TabPanel', TabPanel);
 app.component('ProgressBar', ProgressBar);
 app.component('Paginator', Paginator);
-
+app.component('Toast', Toast);
 app.mount('#app');
