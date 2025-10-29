@@ -127,18 +127,25 @@ const gotoReservation = () => {
 
     <TabPanel value="1">
       <EntityRatings
+        v-if="room !== null"
         target-type="room"
         :target-id="room.id"
         title="Room Rating"
         :primary-name="room.name"
       />
       <EntityRatings
+        v-if="host !== null"
         target-type="host"
         :target-id="room.hostID"
         title="Host Rating"
         :primary-name="host.name"
         :secondary-name="host.surname"
       />
+
+      <Message v-else severity="info" size="small" variant="simple">
+        Reviews aren't available at the moment.
+      </Message>
+
     </TabPanel>
 
     <TabPanel value="2">
