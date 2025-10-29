@@ -80,3 +80,23 @@ axiosInstanceNotifications.interceptors.response.use(
     response => response,
     error => Promise.reject(error)
 );
+
+export const axiosInstanceRatings = axios.create({
+  baseURL: (window.__ENV__?.VITE_RATING_SERVICE_URL || "http://localhost:8510") + "/api",
+});
+
+axiosInstanceRatings.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+axiosInstanceRatings.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(error)
+);
