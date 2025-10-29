@@ -35,7 +35,12 @@ const loadRoom = async () => {
     const hostRes = await UserAPI.findById(room.value.hostID);
     host.value = hostRes.data;
   } catch (err) {
-    console.error(err as AxiosError);
+    if (err.response?.status === 404) {
+        error.value = "Room not found or deleted.";
+    } else {
+        error.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
+    }  
+    console.log(err as AxiosError);
   } finally {
     loading.value = false;
   }
