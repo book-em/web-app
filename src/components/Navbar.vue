@@ -84,7 +84,7 @@ const computeNavbar = () => {
                 break;
             case UserRole.Guest:
                 navbarItems.value.push({ label: 'My Reservations', icon: 'pi pi-book', command: () => goto(`/reservation/user/${auth.id}`) });
-                navbarItems.value.push({ label: 'History', icon: 'pi pi-history', command: () => goto('/') });
+                navbarItems.value.push({ label: 'History', icon: 'pi pi-history', command: () => goto('/reservation/history') });
                 navbarItems.value.push({ label: 'Notifications' + (notificationStore.unreadCount > 0 ? ` (${notificationStore.unreadCount})` : ''),
                  icon: 'pi' + (notificationStore.unreadCount > 0 ? ` pi-exclamation-circle` : ' pi-bell'), command: () => goto('/notifications') });
                 break;

@@ -71,92 +71,90 @@ const gotoReservation = () => {
         <h2>{{ room.name }}</h2>
         <p>{{ room.description }}</p>
 
-        <Tabs value="0">
-            <TabList>
-                <Tab value="0"><i class="pi pi-info-circle"> Details</i></Tab>
+<Tabs value="0">
+  <TabList>
+    <Tab value="0"><i class="pi pi-info-circle"> Details</i></Tab>
+    <Tab value="1"><i class="pi pi-star"> Reviews</i></Tab>
 
+    <template v-if="auth.role == UserRole.Host">
+      <Tab value="2"><i class="pi pi-calendar"> Availability</i></Tab>
+      <Tab value="3"><i class="pi pi-dollar"> Price</i></Tab>
+      <Tab v-if="!room.autoApprove" value="4"><i class="pi pi-question-circle room-icon"> Reservation requests</i></Tab>
+    </template>
+  </TabList>
 
-                <template v-if="auth.role == UserRole.Host">
-                    <Tab value="1"><i class="pi pi-calendar"> Availability</i></Tab>
-                    <Tab value="2"><i class="pi pi-dollar"> Price</i></Tab>
-                    <Tab v-if="!room.autoApprove" value="3"><i class="pi pi-question-circle room-icon"> Reservation requests</i></Tab>
+  <TabPanels>
+    <TabPanel value="0">
+      <div class="room-info">
+        <div class="room-info-section">
+          <i class="pi pi-map-marker room-icon"></i>
+          <span>{{ room.address }}</span>
+        </div>
+        <div class="room-info-section">
+          <i class="pi pi-users room-icon"></i>
+          <span>{{ room.minGuests }} - {{ room.maxGuests }} guests</span>
+        </div>
+        <div class="room-info-section">
+          <i class="pi pi-list room-icon"></i>
+          <div class="room-commodities">
+            <Tag v-for="commodity in room.commodities" :key="commodity" severity="info" :value="commodity" />
+          </div>
+        </div>
+        <div class="room-info-section auto-approve-status">
+          <i class="pi pi-check-circle room-icon" v-if="room.autoApprove"></i>
+          <i class="pi pi-clock room-icon" v-else></i>
+          <Tag v-if="room.autoApprove" value="Instant booking" />
+          <Tag v-else class="warning-tag" value="Host approval needed" />
+        </div>
+      </div>
 
-                </template>
-            </TabList>
+      <Galleria :value="room.photos" :responsiveOptions="galleryResponsiveOptions" :numVisible="5"
+        containerStyle="max-width: 80%; margin: auto;" class="preview-item">
+        <template #item="slotProps">
+          <Image :src="`${RoomImageURL}/img/${slotProps.item}`" preview
+            style="width: 300px; height: 300px; object-fit: cover;" />
+        </template>
+        <template #thumbnail="slotProps">
+          <img :src="`${RoomImageURL}/img/${slotProps.item}`"
+            style="width: 100px; height: 100px; object-fit: cover;" />
+        </template>
+      </Galleria>
 
-            <TabPanels>
-                <template v-if="auth.role == UserRole.Guest">
-                    <Button v-on:click="gotoReservation">Book a reservation</Button>
-                </template>
-                <TabPanel value="0">
-                    <div class="room-info">
-                        <div class="room-info-section">
-                            <i class="pi pi-map-marker room-icon"></i>
-                            <span>{{ room.address }}</span>
-                        </div>
-                        <div class="room-info-section">
-                            <i class="pi pi-users room-icon"></i>
-                            <span>{{ room.minGuests }} - {{ room.maxGuests }} guests</span>
-                        </div>
-                        <div class="room-info-section">
-                            <i class="pi pi-list room-icon"></i>
-                            <div class="room-commodities">
-                                <Tag v-for="commodity in room.commodities" :key="commodity" severity="info" :value="commodity"/>
-                            </div>
-                        </div>
-                        <div class="room-info-section auto-approve-status">
-                            <i class="pi pi-check-circle room-icon" v-if="room.autoApprove"></i>
-                            <i class="pi pi-clock room-icon" v-else></i>
-                            <Tag v-if="room.autoApprove" value="Instant booking" />
-                            <Tag v-else class="warning-tag" value="Host approval needed" />
-                        </div>
-                    </div>
+      <template v-if="auth.role == UserRole.Guest">
+        <Button @click="gotoReservation">Book a reservation</Button>
+      </template>
+    </TabPanel>
 
-                    <Galleria :value="room.photos" :responsiveOptions="galleryResponsiveOptions" :numVisible="5"
-                        containerStyle="max-width: 80%; margin: auto;" class="preview-item">
-                        <template #item="slotProps">
-                            <Image :src="`${RoomImageURL}/img/${slotProps.item}`" preview
-                                style="width: 300px; height: 300px; object-fit: cover;" />
-                        </template>
-                        <template #thumbnail="slotProps">
-                            <img :src="`${RoomImageURL}/img/${slotProps.item}`"
-                                style="width: 100px; height: 100px; object-fit: cover;" />
-                        </template>
-                    </Galleria>
+    <TabPanel value="1">
+      <EntityRatings
+        target-type="room"
+        :target-id="room.id"
+        title="Room Rating"
+        :primary-name="room.name"
+      />
+      <EntityRatings
+        target-type="host"
+        :target-id="room.hostID"
+        title="Host Rating"
+        :primary-name="host.name"
+        :secondary-name="host.surname"
+      />
+    </TabPanel>
 
-                    <EntityRatings
-                        v-if="room"
-                        target-type="room"
-                        :target-id="room.id"
-                        title="Room Rating"
-                        :primary-name="room.name"
-                    />
+    <TabPanel value="2">
+      <RoomAvailabilityEditor :roomId="room.id" />
+    </TabPanel>
 
-                    <EntityRatings
-                        v-if="host"
-                        target-type="host"
-                        :target-id="room.hostID"
-                        title="Host Rating"
-                        :primary-name="host?.name"
-                        :secondary-name="host?.surname"
+    <TabPanel value="3">
+      <RoomPriceEditor :roomId="room.id" />
+    </TabPanel>
 
-                    />
+    <TabPanel value="4">
+      <RoomActiveRequestEditor :roomId="room.id" />
+    </TabPanel>
+  </TabPanels>
+</Tabs>
 
-                </TabPanel>
-
-                <TabPanel value="1">
-                    <RoomAvailabilityEditor :roomId="room.id" />
-                </TabPanel>
-
-                <TabPanel value="2">
-                    <RoomPriceEditor :roomId="room.id" />
-                </TabPanel>
-
-                <TabPanel value="3">
-                    <RoomActiveRequestEditor :roomId="room.id" />
-                </TabPanel>
-            </TabPanels>
-        </Tabs>
     </div>
 </template>
 

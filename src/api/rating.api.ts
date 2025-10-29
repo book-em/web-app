@@ -29,7 +29,7 @@ export class RatingAPI {
     return axiosInstanceRatings.post(`/ratings/${targetId}`, data, {params: { type },});
   }
 
-  static deleteMyRating(targetId: number | string, type: RatingTargetType): Promise<AxiosResponse<void>> {
+  static deleteRating(targetId: number | string, type: RatingTargetType): Promise<AxiosResponse<void>> {
     return axiosInstanceRatings.delete(`/ratings/${targetId}`, {params: { type },});
   }
 }
