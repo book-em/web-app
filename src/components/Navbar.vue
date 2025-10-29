@@ -94,7 +94,6 @@ const computeNavbar = () => {
                 navbarItems.value.push({ label: 'Reservations', icon: 'pi pi-address-book', command: () => goto(`/reservation/host`) });
                 navbarItems.value.push({ label: 'Notifications' + (notificationStore.unreadCount > 0 ? ` (${notificationStore.unreadCount})` : ''),
                  icon: 'pi' + (notificationStore.unreadCount > 0 ? ` pi-exclamation-circle` : ' pi-bell'), command: () => goto('/notifications') });
-                navbarItems.value.push({ label: 'Ratings', icon: 'pi pi-star', command: () => goto('/') });
                 break;
         }
     }
