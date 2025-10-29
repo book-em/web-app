@@ -35,7 +35,11 @@ const acceptRequest = (reservationRequestId: number) => {
             loadRequests();
         })
         .catch((err: AxiosError) => {
-            requestsError.value = err.message;
+            if (err.response?.status === 404) {
+                requestsError.value = "Reservation request not found or deleted.";
+            } else {
+                requestsError.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
+            }
         })
         .finally(() => {
             loading.value = false;
@@ -52,7 +56,11 @@ const rejectRequest = (reservationRequestId: number) => {
             loadRequests();
         })
         .catch((err: AxiosError) => {
-            requestsError.value = err.message;
+            if (err.response?.status === 404) {
+                requestsError.value = "Reservation request not found or deleted.";
+            } else {
+                requestsError.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
+            }
         })
         .finally(() => {
             loading.value = false;
