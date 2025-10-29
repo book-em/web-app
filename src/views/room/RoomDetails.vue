@@ -30,7 +30,11 @@ const loadRoom = () => {
     RoomAPI.findById(roomId).then((res: AxiosResponse<RoomDTO>) => {
         room.value = res.data;
     }).catch((err: AxiosError) => {
-        error.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
+        if (err.response?.status === 404) {
+            error.value = "Room not found or deleted.";
+        } else {
+            error.value = (err.response?.data as { error: string })?.error ?? "An unknown error occurred.";        
+        }
         console.error(err);
     }).finally(() => {
         loading.value = false;
